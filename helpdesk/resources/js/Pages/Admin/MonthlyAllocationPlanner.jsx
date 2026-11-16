@@ -113,112 +113,111 @@ export default function MonthlyAllocationPlanner({
 
     return (
         <DashboardLayout title="Monthly CSV plan" activePage="monthly-allocation">
-            <div className="dashboard-title-row">
-                <div>
-                    <p className="eyebrow">ADMIN TOOLS</p>
-                    <h1>Monthly CSV plan</h1>
-                    <p className="dashboard-subtitle">Download a CSV with one row for each weekday in the selected month.</p>
-                </div>
-            </div>
-
-            <section className="admin-card allocation-planner-card">
-                <div className="admin-card-heading">
+            <section className="icloud-section">
+                <div className="icloud-section-head mb-6">
                     <div>
-                        <span className="step-label">MONTHLY CSV</span>
-                        <h2>Select a month</h2>
-                        <p className="allocation-description">The CSV matches your example columns: number, datetime, value, refnumber, and ads. It includes weekdays only, uses times from 8:00–11:59 AM, and applies your month-end allocation rule: extra below PHP 500 goes to the last day; PHP 500 or more is split across the final two days.</p>
+                        <p className="eyebrow">ADMIN TOOLS</p>
+                        <h1 className="icloud-title">Monthly CSV plan</h1>
+                        <p className="icloud-subtitle">Download a CSV with one row for each weekday in the selected month.</p>
                     </div>
                 </div>
 
-                <div className="allocation-controls">
-                    <label className="allocation-field" htmlFor="allocation-month">
-                        Month
-                        <input
-                            id="allocation-month"
-                            type="month"
-                            value={month}
-                            onChange={(event) => {
-                                if (!event.target.value) return;
-                                setMonth(event.target.value);
-                                setDownloaded(false);
-                            }}
-                        />
-                    </label>
-                    <label className="allocation-field" htmlFor="allocation-target">
-                        Monthly target (PHP)
-                        <input
-                            id="allocation-target"
-                            type="number"
-                            min="1"
-                            max={Number.MAX_SAFE_INTEGER}
-                            step="1"
-                            value={target}
-                            onChange={(event) => {
-                                setTarget(event.target.value);
-                                setDownloaded(false);
-                            }}
-                        />
-                    </label>
-                    <label className="allocation-field" htmlFor="allocation-base-amount">
-                        Base weekday amount (PHP)
-                        <input
-                            id="allocation-base-amount"
-                            type="number"
-                            min="1"
-                            max={Number.MAX_SAFE_INTEGER}
-                            step="1"
-                            value={baseWeekdayAmount}
-                            onChange={(event) => {
-                                setBaseWeekdayAmount(event.target.value);
-                                setDownloaded(false);
-                            }}
-                        />
-                    </label>
-                    <div className="allocation-actions">
-                        <button className="sign-in-button" type="button" onClick={downloadPlan} disabled={processing || !validAmounts}>
-                            {processing ? 'Preparing CSV…' : 'Download CSV'}
-                        </button>
-                        <button
-                            className="secondary-action"
-                            type="button"
-                            onClick={() => {
-                                setPreviewRandomization((value) => value + 1);
-                                setDownloaded(false);
-                            }}
-                            disabled={processing || adPaths.length === 0}
-                        >
-                            Rerandomize preview
-                        </button>
+                <section className="admin-card allocation-planner-card icloud-card p-0">
+                    <div className="admin-card-heading p-5 border-b border-icloud-border"><div><span className="step-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Monthly CSV</span><h2 className="text-lg font-bold text-icloud-text">Select a month</h2><p className="allocation-description text-[0.8rem] text-icloud-text-secondary">The CSV matches your example columns: number, datetime, value, refnumber, and ads. It includes weekdays only, uses times from 8:00–11:59 AM, and applies your month-end allocation rule: extra below PHP 500 goes to the last day; PHP 500 or more is split across the final two days.</p></div></div>
+
+                    <div className="allocation-controls p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label className="allocation-field flex flex-col gap-1.5">
+                            <span className="icloud-label">Month</span>
+                            <input
+                                id="allocation-month"
+                                type="month"
+                                className="icloud-input"
+                                value={month}
+                                onChange={(event) => {
+                                    if (!event.target.value) return;
+                                    setMonth(event.target.value);
+                                    setDownloaded(false);
+                                }}
+                            />
+                        </label>
+                        <label className="allocation-field flex flex-col gap-1.5">
+                            <span className="icloud-label">Monthly target (PHP)</span>
+                            <input
+                                id="allocation-target"
+                                type="number"
+                                min="1"
+                                max={Number.MAX_SAFE_INTEGER}
+                                step="1"
+                                className="icloud-input"
+                                value={target}
+                                onChange={(event) => {
+                                    setTarget(event.target.value);
+                                    setDownloaded(false);
+                                }}
+                            />
+                        </label>
+                        <label className="allocation-field flex flex-col gap-1.5">
+                            <span className="icloud-label">Base weekday amount (PHP)</span>
+                            <input
+                                id="allocation-base-amount"
+                                type="number"
+                                min="1"
+                                max={Number.MAX_SAFE_INTEGER}
+                                step="1"
+                                className="icloud-input"
+                                value={baseWeekdayAmount}
+                                onChange={(event) => {
+                                    setBaseWeekdayAmount(event.target.value);
+                                    setDownloaded(false);
+                                }}
+                            />
+                        </label>
+                        <div className="allocation-actions flex flex-col md:flex-row md:items-end gap-3">
+                            <button className="icloud-btn" type="button" onClick={downloadPlan} disabled={processing || !validAmounts}>
+                                {processing ? 'Preparing CSV…' : 'Download CSV'}
+                            </button>
+                            <button
+                                className="icloud-btn-secondary"
+                                type="button"
+                                onClick={() => {
+                                    setPreviewRandomization((value) => value + 1);
+                                    setDownloaded(false);
+                                }}
+                                disabled={processing || adPaths.length === 0}
+                            >
+                                Rerandomize preview
+                            </button>
+                        </div>
                     </div>
-                </div>
-                {!validAmounts && <p className="dashboard-notice error" role="alert">Enter positive whole-peso values for the monthly target and base weekday amount.</p>}
+                    {!validAmounts && <p className="px-5 pb-4"><div className="p-3 border border-red-100 bg-red-50 rounded-xl text-[0.8rem] text-red-700" role="alert">Enter positive whole-peso values for the monthly target and base weekday amount.</div></p>}
 
-                <div className="allocation-summary" aria-live="polite">
-                    <div><span>Monthly target</span><strong>{formatAmount(validTarget ? numericTarget : 0)}</strong></div>
-                    <div><span>Weekdays scheduled</span><strong>{plan.length}</strong></div>
-                    <div><span>Base weekday amount</span><strong>{formatAmount(baseAmount)}</strong></div>
-                    <div><span>Final two weekday amounts</span><strong>{finalTwoWeekdayAmounts}</strong></div>
-                </div>
+                    <div className="allocation-summary p-5 border-t border-icloud-border/50 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Monthly target</span><strong className="text-icloud-text">{formatAmount(validTarget ? numericTarget : 0)}</strong></div>
+                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Weekdays scheduled</span><strong className="text-icloud-text">{plan.length}</strong></div>
+                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Base weekday amount</span><strong className="text-icloud-text">{formatAmount(baseAmount)}</strong></div>
+                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Final two weekday amounts</span><strong className="text-icloud-text">{finalTwoWeekdayAmounts}</strong></div>
+                    </div>
 
-                <div className="table-wrap allocation-table-wrap">
-                    <table>
-                        <thead><tr><th>CSV date</th><th>Weekday</th><th>Value</th><th>Reference number</th><th>Ad path</th></tr></thead>
-                        <tbody>
-                            {plan.map((entry) => (
-                                <tr key={entry.date}>
-                                    <td>{entry.date}</td>
-                                    <td>{formatDate(entry.date)}</td>
-                                    <td>{formatAmount(entry.amount)}</td>
-                                    <td>{entry.referenceNumber}</td>
-                                    <td className="allocation-ad-path" title={entry.adPath}>{entry.adPath || 'No ad assets configured'}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                    <div className="table-wrap allocation-table-wrap p-5 border-t border-icloud-border/50 overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-sm">
+                            <thead><tr className="border-b border-icloud-border/50"><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">CSV date</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Weekday</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Value</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Reference number</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Ad path</th></tr></thead>
+                            <tbody>
+                                {plan.map((entry) => (
+                                    <tr key={entry.date} className="border-b border-icloud-border/50 hover:bg-icloud-bg transition-colors">
+                                        <td className="py-2 text-[0.8rem] text-icloud-text">{entry.date}</td>
+                                        <td className="py-2 text-[0.8rem] text-icloud-text-secondary">{formatDate(entry.date)}</td>
+                                        <td className="py-2 text-[0.8rem] text-icloud-text-secondary">{formatAmount(entry.amount)}</td>
+                                        <td className="py-2 text-[0.8rem] text-icloud-text-secondary">{entry.referenceNumber}</td>
+                                        <td className="allocation-ad-path py-2 text-[0.8rem] text-icloud-text-secondary" title={entry.adPath}>{entry.adPath || 'No ad assets configured'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
 
-                {error && <p className="dashboard-notice error" role="alert">{error}</p>}
-                {downloaded && <p className="allocation-download-status" role="status">The monthly CSV has been downloaded.</p>}
+                    {error && <p className="px-5 py-4"><div className="p-3 border border-red-100 bg-red-50 rounded-xl text-[0.8rem] text-red-700" role="alert">{error}</div></p>}
+                    {downloaded && <p className="px-5 py-4 text-[0.8rem] text-green-700 bg-green-50 rounded-xl border border-green-100" role="status">The monthly CSV has been downloaded.</p>}
+                </section>
             </section>
         </DashboardLayout>
     );

@@ -28,7 +28,7 @@ class UserController extends Controller
 
         return Inertia::render('Admin/Users', [
             'users' => $users,
-            'activePage' => 'users',
+            'activePage' => 'settings',
         ]);
     }
 

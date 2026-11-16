@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +9,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AccomplishmentController extends Controller
 {
@@ -173,60 +171,6 @@ class AccomplishmentController extends Controller
         return back()->with('success', 'Accomplishment removed from your board.');
     }
 
-    public function report(Request $request): StreamedResponse
-    {
-        $validated = $request->validate([
-            'year' => ['required', 'integer', 'min:2000', 'max:2100'],
-            'quarter' => ['required', Rule::in(['1', '2', '3', '4'])],
-        ]);
-        $year = (int) $validated['year'];
-        $quarter = (int) $validated['quarter'];
-        $periodStart = CarbonImmutable::create($year, (($quarter - 1) * 3) + 1, 1)->startOfDay();
-        $periodEnd = $periodStart->addMonths(3);
-
-        try {
-            $accomplishments = DB::table('helpdesk_accomplishments')
-                ->where('created_by', $request->session()->get('user.id'))
-                ->where('status', 'completed')
-                ->whereNotNull('completed_at')
-                ->where('completed_at', '>=', $periodStart)
-                ->where('completed_at', '<', $periodEnd)
-                ->orderBy('completed_at')
-                ->get(['title', 'description', 'due_date', 'completed_at']);
-        } catch (\Throwable $exception) {
-            Log::error('Accomplishment report could not load.', ['exception' => $exception, 'year' => $year, 'quarter' => $quarter]);
-            abort(503, 'The accomplishment report is unavailable. Check that the application database is up to date.');
-        }
-
-        $output = fopen('php://temp', 'w+');
-        if ($output === false) {
-            throw new \RuntimeException('Could not create the accomplishment report.');
-        }
-        fputcsv($output, ['Title', 'Description', 'Due date', 'Completed on'], ',', '"', '');
-        foreach ($accomplishments as $accomplishment) {
-            fputcsv($output, [
-                $this->spreadsheetSafe($accomplishment->title),
-                $this->spreadsheetSafe($accomplishment->description ?? ''),
-                $accomplishment->due_date ?? '',
-                CarbonImmutable::parse($accomplishment->completed_at)->format('Y-m-d'),
-            ], ',', '"', '');
-        }
-        rewind($output);
-        $csv = stream_get_contents($output);
-        fclose($output);
-        if ($csv === false) {
-            throw new \RuntimeException('Could not read the accomplishment report.');
-        }
-
-        return response()->streamDownload(
-            static function () use ($csv): void {
-                echo $csv;
-            },
-            "accomplishments-Q{$quarter}-{$year}.csv",
-            ['Content-Type' => 'text/csv; charset=UTF-8'],
-        );
-    }
-
     private function rules(): array
     {
         return [
@@ -235,10 +179,5 @@ class AccomplishmentController extends Controller
             'due_date' => ['nullable', 'date_format:Y-m-d'],
             'status' => ['required', Rule::in(['todo', 'completed'])],
         ];
-    }
-
-    private function spreadsheetSafe(string $value): string
-    {
-        return preg_match('/^[\t\r\n ]*[=+\-@]/', $value) === 1 ? "'".$value : $value;
     }
 }

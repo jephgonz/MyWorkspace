@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { appUrl } from '../../url';
 
 export default function Login() {
@@ -9,31 +9,37 @@ export default function Login() {
     return (
         <>
             <Head title="Administrator sign in" />
-            <main className="login-shell admin-login-shell">
-                <section className="welcome-panel" aria-label="Jephthah's Workbench sign-in">
-                    <Link className="brand" href={appUrl('/')}><span className="brand-mark brand-logo"><img src={appUrl('/public/assets/images/SP.ico')} alt="" /></span><span className="brand-name"><strong>Jephthah's Workbench</strong></span></Link>
-                    <div className="welcome-copy">
-                        <span className="eyebrow"><span className="eyebrow-dot" /> PRIVATE WORKSPACE</span>
-                        <h1>Your work,<br />all in one place.</h1>
-                        <p>Sign in to access your workbench, manage your tasks, and use your workspace tools.</p>
-                        <div className="support-illustration" aria-hidden="true"><div className="illustration-orbit orbit-one" /><div className="illustration-orbit orbit-two" /><div className="ticket-card"><div className="ticket-top"><span className="ticket-symbol">✓</span><span className="ticket-status">WORKSPACE</span><span className="ticket-dots">•••</span></div><div className="ticket-line line-long" /><div className="ticket-line line-short" /><div className="ticket-bottom"><span className="ticket-avatar">JW</span><span>Your work, organized</span><span className="ticket-arrow">↗</span></div></div><span className="float-star star-one">✦</span><span className="float-star star-two">✦</span></div>
+            <main className="icloud-page min-h-screen flex items-center justify-center px-4">
+                <div className="icloud-card icloud-login-card w-full max-w-md p-6">
+                    <div className="icloud-login-brand flex items-center gap-3 mb-7">
+                        <span className="icloud-brand-mark"><img src={appUrl('/public/assets/images/SP.ico')} alt="" /></span>
+                        <span className="icloud-brand-copy"><strong>Jephthah's Workbench</strong><small>Administrator access</small></span>
                     </div>
-                    <div className="welcome-footer"><span className="online-dot" />Administrator workspace <span className="footer-divider">·</span> Jephthah's Workbench</div>
-                </section>
-                <section className="form-panel" aria-labelledby="login-title">
-                    <div className="mobile-brand"><span className="brand-mark brand-logo"><img src={appUrl('/public/assets/images/SP.ico')} alt="" /></span><span><strong>Jephthah's Workbench</strong></span></div>
-                    <div className="login-card">
-                        <div className="login-heading"><span className="login-icon login-brand-logo" aria-hidden="true"><img src={appUrl('/public/assets/images/SP.ico')} alt="" /></span><p className="eyebrow">ADMIN ACCESS</p><h2 id="login-title">Administrator sign in</h2><p className="login-subtitle">Use your administrator email and password.</p></div>
-                        {error && <div className="notice" role="alert">{error}</div>}
-                        <form className="login-form" onSubmit={(event) => { event.preventDefault(); form.post(appUrl('/admin/login')); }}>
-                            <div className="field"><label htmlFor="email">Administrator email</label><div className="input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="m4.5 7 7.5 5.5L19.5 7" /></svg><input id="email" type="email" autoComplete="username" placeholder="Your administrator email" value={form.data.email} onChange={(event) => form.setData('email', event.target.value)} required /></div></div>
-                            <div className="field"><label htmlFor="password">Password</label><div className="input-wrap"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="4.5" y="10" width="15" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /><path d="M12 14v2" /></svg><input id="password" type="password" autoComplete="current-password" placeholder="Enter your password" value={form.data.password} onChange={(event) => form.setData('password', event.target.value)} required /></div></div>
-                            <button className="sign-in-button" type="submit" disabled={form.processing}>{form.processing ? 'Signing in…' : <>Sign in <span aria-hidden="true">→</span></>}</button>
-                        </form>
-                        <p className="access-note"><Link href={appUrl('/')}>← Return to sign in</Link></p>
-                    </div>
-                    <footer className="form-footer"><span>© {new Date().getFullYear()} Jephthah's Workbench</span><span>Administrator access only</span></footer>
-                </section>
+                    <h1 className="text-[1.5rem] font-bold text-icloud-text mb-1">Sign in</h1>
+                    <p className="text-[0.85rem] text-icloud-text-secondary mb-6">Use your administrator email and password.</p>
+                    {error && <div className="icloud-card border-icloud-danger bg-red-50 p-3 mb-5 text-[0.8rem] text-icloud-danger rounded-xl" role="alert">{error}</div>}
+                    <form className="login-form" onSubmit={(event) => { event.preventDefault(); form.post(appUrl('/admin/login')); }}>
+                        <div className="field flex flex-col gap-1.5">
+                            <label className="icloud-label" htmlFor="email">Administrator email</label>
+                            <div className="relative">
+                                <svg viewBox="0 0 24 24" className="login-input-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-icloud-text-tertiary" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><rect x="3.5" y="5.5" width="17" height="13" rx="2" /><path d="m4.5 7 7.5 5.5L19.5 7" /></svg>
+                                <input id="email" type="email" autoComplete="username" placeholder="Your administrator email" className="icloud-input w-full pl-9" value={form.data.email} onChange={(event) => form.setData('email', event.target.value)} required />
+                            </div>
+                            {form.errors.email && <p className="text-[0.75rem] text-icloud-danger">{form.errors.email}</p>}
+                        </div>
+                        <div className="field flex flex-col gap-1.5">
+                            <label className="icloud-label" htmlFor="password">Password</label>
+                            <div className="relative">
+                                <svg viewBox="0 0 24 24" className="login-input-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-icloud-text-tertiary" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><rect x="4.5" y="10" width="15" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /><path d="M12 14v2" /></svg>
+                                <input id="password" type="password" autoComplete="current-password" placeholder="Enter your password" className="icloud-input w-full pl-9" value={form.data.password} onChange={(event) => form.setData('password', event.target.value)} required />
+                            </div>
+                            {form.errors.password && <p className="text-[0.75rem] text-icloud-danger">{form.errors.password}</p>}
+                        </div>
+                        {form.errors.form && <p className="text-[0.75rem] text-icloud-danger">{form.errors.form}</p>}
+                        <button className="icloud-btn w-full" type="submit" disabled={form.processing}>{form.processing ? 'Signing in…' : 'Sign in'}</button>
+                    </form>
+                    <footer className="mt-6 pt-4 border-t border-icloud-border flex justify-between text-[0.7rem] text-icloud-text-tertiary"><span>© {new Date().getFullYear()} Jephthah's Workbench</span><span>Administrator access only</span></footer>
+                </div>
             </main>
         </>
     );

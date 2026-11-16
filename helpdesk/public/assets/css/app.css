@@ -713,16 +713,23 @@ button:focus-visible,a[href]:focus-visible{outline:2px solid #6689c4;outline-off
 .accomplishment-heading{align-items:center;margin-bottom:22px}
 .accomplishment-heading h2{font-size:20px}
 .accomplishment-heading p{font-size:13px}
-.accomplishment-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 -24px 18px;padding:0 24px 18px;border-bottom:1px solid #edf0f4}
+.accomplishment-toolbar{display:grid;gap:13px;margin:0 -24px 18px;padding:0 24px 18px;border-bottom:1px solid #edf0f4}
 .accomplishment-filters{display:flex;flex-wrap:wrap;gap:7px}
+.accomplishment-filter-label{align-self:center;margin-right:3px;color:#69768b;font-size:12px;font-weight:600}
 .filter-chip{min-height:36px;padding:0 13px;border:1px solid #e4e9f0;border-radius:18px;background:#fff;color:#65738a;font:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .filter-chip:hover{border-color:#c4d2e5;background:#f8faff}
 .filter-chip.active{border-color:#d8e4f6;background:#edf3fd;color:#315e9e}
-.quarter-report-form{display:flex;align-items:flex-end;gap:9px}
-.quarter-report-form label{display:grid;gap:5px;color:#69768b;font-size:11px;font-weight:600}
-.quarter-report-form input,.quarter-report-form select{min-height:38px;padding:0 10px;border:1px solid #dfe4ec;border-radius:7px;background:#fff;color:#34425b;font:inherit;font-size:13px}
-.quarter-report-form input{width:90px}
-.report-download{display:flex;min-height:38px;align-items:center;white-space:nowrap}
+.accomplishment-period-controls{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.accomplishment-period-options{display:flex;flex-wrap:wrap;gap:7px}
+.accomplishment-period-picker{display:flex;align-items:center;gap:8px;color:#69768b;font-size:12px;font-weight:600}
+.accomplishment-period-picker label{display:grid;gap:4px;color:#69768b;font-size:11px;font-weight:600}
+.accomplishment-period-picker input,.accomplishment-period-picker select{min-height:36px;padding:0 10px;border:1px solid #dfe4ec;border-radius:7px;background:#fff;color:#34425b;font:inherit;font-size:13px}
+.quarter-period-picker{gap:9px}
+.quarter-period-picker input{width:94px}
+.week-period-picker{gap:10px}
+.week-period-picker>span{min-width:175px;color:#34425b;text-align:center}
+.period-navigation-button{display:grid;width:36px;height:36px;place-items:center;border:1px solid #e4e9f0;border-radius:7px;background:#fff;color:#405371;font:inherit;font-size:22px;line-height:1;cursor:pointer}
+.period-navigation-button:disabled{cursor:default;opacity:.45}
 .accomplishment-list{display:grid;gap:11px}
 .accomplishment-item{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:17px;border:1px solid #e9edf3;border-radius:9px;background:#fff;transition:border-color .18s,box-shadow .18s}
 .accomplishment-item:hover{border-color:#d9e2ef;box-shadow:0 4px 14px rgba(24,43,75,.045)}
@@ -745,9 +752,9 @@ button:focus-visible,a[href]:focus-visible{outline:2px solid #6689c4;outline-off
 .task-action.remove{color:#a34040}
 .task-action.remove:hover{border-color:#efd4d4;background:#fff5f5;color:#8e3030}
 .field-error{display:block;margin-top:5px;color:#b54141;font-size:12px}
-@media(max-width:900px){.accomplishment-toolbar{align-items:flex-start;flex-direction:column}.quarter-report-form{width:100%}}
+@media(max-width:900px){.accomplishment-period-controls{align-items:flex-start;flex-direction:column}}
 @media(max-width:760px){.accomplishment-page-heading{align-items:flex-start}.accomplishment-page-heading .dashboard-subtitle{font-size:13px}.accomplishment-add-button{min-height:42px}.accomplishment-stats{gap:8px}.accomplishment-stat{min-height:108px;padding:15px}.accomplishment-toolbar{margin-right:-17px;margin-left:-17px;padding-right:17px;padding-left:17px}.accomplishment-item{padding:14px}}
-@media(max-width:460px){.accomplishment-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.accomplishment-stat:last-child{grid-column:1/-1}.accomplishment-form-row{grid-template-columns:1fr}.accomplishment-board-card,.accomplishment-editor{padding:16px}.accomplishment-toolbar{margin-right:-16px;margin-left:-16px;padding-right:16px;padding-left:16px}.quarter-report-form{display:grid;grid-template-columns:1fr 1fr;align-items:end}.quarter-report-form label{min-width:0}.quarter-report-form input,.quarter-report-form select{width:100%}.report-download{grid-column:1/-1;width:100%}.accomplishment-item{flex-direction:column}.accomplishment-actions{align-self:flex-end}}
+@media(max-width:460px){.accomplishment-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.accomplishment-stat:last-child{grid-column:1/-1}.accomplishment-form-row{grid-template-columns:1fr}.accomplishment-board-card,.accomplishment-editor{padding:16px}.accomplishment-toolbar{margin-right:-16px;margin-left:-16px;padding-right:16px;padding-left:16px}.accomplishment-period-controls{width:100%}.accomplishment-period-options{width:100%}.accomplishment-period-options .filter-chip{flex:1;padding:0 8px}.accomplishment-period-picker{width:100%;justify-content:space-between}.quarter-period-picker label{flex:1}.quarter-period-picker input,.quarter-period-picker select{width:100%}.week-period-picker>span{min-width:0;flex:1}.accomplishment-item{flex-direction:column}.accomplishment-actions{align-self:flex-end}}
 
 .overview-page{gap:22px}
 .overview-page>.dashboard-title-row h1{font-size:32px}
@@ -934,53 +941,77 @@ button:focus-visible,a[href]:focus-visible{outline:2px solid #6689c4;outline-off
     .database-workbench-actions{align-items:stretch;flex-direction:column}
     .form-actions{align-items:stretch;flex-direction:column}
     .form-actions .sign-in-button{width:100%}
-    .quarter-report-form{display:grid;grid-template-columns:1fr 1fr}
-    .quarter-report-form label{min-width:0}
-    .quarter-report-form input,.quarter-report-form select{width:100%}
-    .report-download{grid-column:1/-1;width:100%}
-    .accomplishment-filters .filter-chip,.accomplishment-actions .task-action,.quarter-report-form input,.quarter-report-form select,.quarter-report-form .report-download{min-height:44px}
+    .accomplishment-filters .filter-chip,.accomplishment-period-options .filter-chip,.accomplishment-actions .task-action,.accomplishment-period-picker input,.accomplishment-period-picker select,.period-navigation-button{min-height:44px}
     .accomplishment-actions .task-action{min-width:44px}
 }
 
-.accomplishment-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.accomplishment-stat{min-height:0;gap:6px;padding:14px 15px;border-radius:10px;box-shadow:0 2px 8px rgba(24,43,75,.035)}
+.accomplishment-page-heading{margin-bottom:18px!important}
+.accomplishment-stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.accomplishment-stat{min-height:0;gap:4px;padding:11px 13px;border-radius:10px;box-shadow:0 2px 8px rgba(24,43,75,.035)}
 .accomplishment-stat>span{font-size:12px}
-.accomplishment-stat>strong{font-size:26px}
+.accomplishment-stat>strong{font-size:23px}
 .accomplishment-stat>small{font-size:11px;line-height:1.35}
-.accomplishment-stat-chart{height:54px;gap:4px;margin-top:1px}
-.accomplishment-stat-chart-item{grid-template-rows:11px 1fr 12px;gap:2px}
+.accomplishment-stat-chart{height:38px;gap:4px;margin-top:0}
+.accomplishment-stat-chart-item{grid-template-rows:10px 1fr 11px;gap:1px}
 .accomplishment-stat-chart-item>small{font-size:9px}
-.accomplishment-stat-chart-item>span{font-size:9px;line-height:12px}
-.accomplishment-editor,.accomplishment-board-card{padding:18px}
-.accomplishment-editor .admin-card-heading,.accomplishment-heading{margin-bottom:14px}
-.accomplishment-heading h2{font-size:18px}
-.accomplishment-heading p{margin-top:4px;font-size:12px}
-.accomplishment-toolbar{gap:12px;margin:0 -18px 14px;padding:0 18px 13px}
-.filter-chip{min-height:32px;padding:0 11px}
+.accomplishment-stat-chart-item>span{font-size:8px;line-height:11px}
+.accomplishment-editor,.accomplishment-board-card{padding:16px}
+.accomplishment-editor .admin-card-heading,.accomplishment-heading{margin-bottom:10px}
+.accomplishment-heading h2{font-size:17px}
+.accomplishment-heading p{margin-top:3px;font-size:11px}
+.accomplishment-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 -16px 12px;padding:0 16px 11px}
+.accomplishment-filters,.accomplishment-period-options{gap:5px}
+.accomplishment-filter-label{font-size:11px}
+.filter-chip{min-height:30px;padding:0 10px;font-size:11px}
+.accomplishment-period-controls{justify-content:flex-end;gap:8px}
+.accomplishment-period-picker input,.accomplishment-period-picker select,.period-navigation-button{min-height:30px}
+.period-navigation-button{width:30px;height:30px;font-size:19px}
+.week-period-picker>span{min-width:145px;font-size:11px}
 .quarter-report-form{gap:7px}
 .quarter-report-form input,.quarter-report-form select,.report-download{min-height:34px}
-.accomplishment-list{gap:8px}
-.accomplishment-item{gap:12px;padding:13px;border-radius:8px}
+.accomplishment-heading .account-count{font-size:11px}
+.accomplishment-list{gap:6px}
+.accomplishment-item{gap:10px;padding:10px 12px;border-radius:8px}
 .accomplishment-item h3{font-size:14px}
-.accomplishment-item p{margin-top:5px;font-size:12px;line-height:1.5}
-.accomplishment-dates{gap:6px;margin-top:8px;font-size:11px}
-.accomplishment-dates span{padding:4px 7px}
-.accomplishment-actions{gap:5px}
+.accomplishment-item p{margin-top:4px;font-size:12px;line-height:1.4}
+.accomplishment-dates{gap:5px;margin-top:6px;font-size:10px}
+.accomplishment-dates span{padding:3px 7px}
+.accomplishment-actions{gap:4px}
 
 @media(max-width:1100px){
     .accomplishment-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
+@media(min-width:901px){
+    .accomplishment-period-controls{flex-wrap:nowrap}
+}
+
+@media(max-width:900px){
+    .accomplishment-toolbar{align-items:flex-start;flex-direction:column}
+    .accomplishment-period-controls{align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+}
+
 @media(max-width:760px){
     .accomplishment-stats{gap:8px}
-    .accomplishment-stat{padding:13px}
+    .accomplishment-stat{padding:11px}
     .accomplishment-board-card,.accomplishment-editor{padding:16px}
     .accomplishment-toolbar{margin-right:-16px;margin-left:-16px;padding-right:16px;padding-left:16px}
 }
 
 @media(max-width:560px){
     .accomplishment-toolbar{align-items:stretch}
+    .accomplishment-period-controls{flex-direction:column}
     .accomplishment-filters{gap:6px}
     .accomplishment-filters .filter-chip{min-height:38px;padding:0 10px}
     .accomplishment-item{padding:12px}
+}
+
+.admin-settings-navigation{display:flex;width:max-content;max-width:100%;gap:4px;margin:0 0 22px;padding:4px;border:1px solid #e8edf4;border-radius:10px;background:#f5f7fa}
+.admin-settings-tab{display:flex;min-height:38px;align-items:center;justify-content:center;padding:0 16px;border:1px solid transparent;border-radius:7px;color:#65738a;font-size:13px;font-weight:600;text-decoration:none;transition:background .15s,color .15s,border-color .15s}
+.admin-settings-tab:hover{color:#315e9e}
+.admin-settings-tab.active{border-color:#e3eaf4;background:#fff;color:#315e9e;box-shadow:0 1px 3px rgba(24,43,75,.08)}
+
+@media(max-width:560px){
+    .admin-settings-navigation{width:100%;margin-bottom:18px}
+    .admin-settings-tab{flex:1;padding:0 10px}
 }

@@ -3,44 +3,71 @@ import { Link } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
 import { appUrl } from '../../url';
 
-export default function Dashboard({ accountCounts = { total: 0, active: 0, administrators: 0 }, openTaskCount = 0, pendingTaskCount = 0, completedThisQuarterCount = 0, pendingTasks = [] }) {
-    const shortcuts = [
-        ['/admin/users', '＋', 'Create admin account', 'Add an administrator and manage access.'],
-        ['/admin/users', '♙', 'Admin accounts', 'Review administrator account status.'],
-        ['/admin/database', '▤', 'MySQL database', 'View connection status, tables, and backups.'],
-    ];
+const apps = [
+    { key: 'accomplishments', label: 'Accomplishments', icon: '✓', color: '#34c759', href: '/admin/accomplishments', desc: 'Track your tasks and completions.' },
+    { key: 'settings', label: 'Admin accounts', icon: '♙', color: '#0071e3', href: '/admin/users', desc: 'Manage administrator accounts.' },
+    { key: 'database', label: 'Database', icon: '▤', color: '#5ac8fa', href: '/admin/database', desc: 'Tables, backups, and SQL workbench.' },
+    { key: 'id-generator', label: 'ID Generator', icon: '▧', color: '#ff9f0a', href: '/admin/tools/id-generator', desc: 'Create employee ID cards.' },
+    { key: 'monthly-allocation', label: 'Monthly CSV', icon: '📊', color: '#bf5af2', href: '/admin/tools/monthly-allocation', desc: 'Download weekday allocation CSV.' },
+];
+
+export default function Dashboard({ accountCounts = { total: 0, active: 0, administrators: 0 }, openTaskCount = 0, pendingTaskCount = 0, completedThisQuarterCount = 0 }) {
     return (
-        <DashboardLayout title="Administration" activePage="overview">
-            <div className="overview-page">
-                <div className="dashboard-title-row"><div><p className="eyebrow">JEPHTHAH'S WORKBENCH</p><h1>Overview</h1><p className="dashboard-subtitle">Manage your work, administrator accounts, and application tools.</p></div></div>
-                <section className="admin-card overview-tasks-card" aria-labelledby="overview-tasks-title">
-                    <div className="admin-card-heading overview-tasks-heading">
-                        <div><span className="step-label">YOUR WORK</span><h2 id="overview-tasks-title">My pending tasks</h2><p>{openTaskCount} task{openTaskCount === 1 ? '' : 's'} still open</p></div>
-                        <Link className="secondary-action" href={appUrl('/admin/accomplishments')}>View task board <span aria-hidden="true">→</span></Link>
+        <DashboardLayout title="Overview" activePage="overview">
+            <section className="icloud-section">
+                <div className="icloud-section-head">
+                    <div>
+                        <p className="eyebrow">JEPHTHAH'S WORKBENCH</p>
+                        <h1 className="icloud-title">Overview</h1>
+                        <p className="icloud-subtitle">Manage your work, administrator accounts, and application tools.</p>
                     </div>
-                    <div className="overview-task-summary" aria-label="Task progress summary">
-                        <article className="overview-task-summary-tile"><span>To do</span><strong>{pendingTaskCount}</strong></article>
-                        <article className="overview-task-summary-tile completed"><span>Accomplished this quarter</span><strong>{completedThisQuarterCount}</strong></article>
-                    </div>
-                    {pendingTasks.length === 0 ? <p className="overview-tasks-empty">You’re all caught up. Add upcoming work on your accomplishment board.</p> :
-                        <ul className="overview-task-list">{pendingTasks.map((task) => <li key={task.id}>
-                            <Link className="overview-task-link" href={appUrl('/admin/accomplishments')}>
-                                <span className="overview-task-dot" aria-hidden="true" />
-                                <span className="overview-task-title">{task.title}</span>
-                                <span className="overview-task-status">To do</span>
-                                {task.due_date && <time dateTime={task.due_date}>Due {new Date(`${task.due_date.slice(0, 10)}T00:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</time>}
+                    <Link className="icloud-btn-secondary" href={appUrl('/admin/accomplishments')}>View task board <span aria-hidden="true">→</span></Link>
+                </div>
+                <div className="grid gap-4 mb-6 md:grid-cols-3">
+                    <article className="icloud-card p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Your pending tasks</p>
+                                <p className="text-2xl font-bold text-icloud-text">{openTaskCount}</p>
+                            </div>
+                            <span className="w-10 h-10 rounded-xl bg-icloud-blue-bg flex items-center justify-center text-icloud-blue text-xl">✓</span>
+                        </div>
+                        <p className="mt-2 text-[0.75rem] text-icloud-text-secondary">Tasks still open across your board.</p>
+                    </article>
+                    <article className="icloud-card p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Completed this quarter</p>
+                                <p className="text-2xl font-bold text-icloud-text">{completedThisQuarterCount}</p>
+                            </div>
+                            <span className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 text-xl">♙</span>
+                        </div>
+                        <p className="mt-2 text-[0.75rem] text-icloud-text-secondary">Accomplishments this quarter.</p>
+                    </article>
+                    <article className="icloud-card p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Administrator accounts</p>
+                                <p className="text-2xl font-bold text-icloud-text">{accountCounts.administrators}</p>
+                            </div>
+                            <span className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xl">♜</span>
+                        </div>
+                        <p className="mt-2 text-[0.75rem] text-icloud-text-secondary">Active administrator accounts.</p>
+                    </article>
+                </div>
+                <div className="icloud-card p-6">
+                    <p className="text-[0.8rem] font-semibold text-icloud-text mb-3">Tools</p>
+                    <div className="icloud-app-grid">
+                        {apps.map((app) => (
+                            <Link key={app.key} className="icloud-app-tile" href={appUrl(app.href)}>
+                                <div className="icloud-app-icon" style={{ background: `linear-gradient(135deg, ${app.color}1a, ${app.color}0d)` }}><span aria-hidden="true" style={{ color: app.color }}>{app.icon}</span></div>
+                                <span className="text-[0.8rem] font-medium text-icloud-text text-center leading-snug">{app.label}</span>
+                                <span className="text-[0.7rem] text-icloud-text-tertiary text-center">{app.desc}</span>
                             </Link>
-                        </li>)}</ul>}
-                </section>
-                <section className="stat-grid" aria-label="Account summary">
-                    <article className="stat-card"><span className="stat-icon blue">♙</span><span className="stat-label">Total accounts</span><strong>{accountCounts.total}</strong><small>Workbench users</small></article>
-                    <article className="stat-card"><span className="stat-icon green">✓</span><span className="stat-label">Active accounts</span><strong>{accountCounts.active}</strong><small>Can sign in</small></article>
-                    <article className="stat-card"><span className="stat-icon gold">♜</span><span className="stat-label">Administrators</span><strong>{accountCounts.administrators}</strong><small>Can manage accounts</small></article>
-                </section>
-                <section className="quick-links" aria-label="Admin shortcuts">
-                    {shortcuts.map(([href, icon, title, description]) => <Link className="quick-link" href={appUrl(href)} key={title}><span className="quick-link-icon">{icon}</span><span><strong>{title}</strong><small>{description}</small></span><span className="quick-link-arrow">→</span></Link>)}
-                </section>
-            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
         </DashboardLayout>
     );
 }

@@ -25,7 +25,6 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function (): 
     Route::post('/notifications/settings', [BrowserNotificationController::class, 'updateSettings'])->name('notifications.settings.update');
     Route::get('/accomplishments', [AccomplishmentController::class, 'index'])->name('accomplishments');
     Route::post('/accomplishments', [AccomplishmentController::class, 'store'])->name('accomplishments.store');
-    Route::get('/accomplishments/report', [AccomplishmentController::class, 'report'])->name('accomplishments.report');
     Route::post('/accomplishments/{accomplishment}/complete', [AccomplishmentController::class, 'complete'])->name('accomplishments.complete');
     Route::post('/accomplishments/{accomplishment}', [AccomplishmentController::class, 'update'])->name('accomplishments.update');
     Route::post('/accomplishments/{accomplishment}/delete', [AccomplishmentController::class, 'destroy'])->name('accomplishments.destroy');

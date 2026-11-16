@@ -733,7 +733,7 @@ class ExampleTest extends TestCase
         });
     }
 
-    public function test_accomplishment_board_tracks_admin_tasks_and_exports_quarterly_report(): void
+    public function test_accomplishment_board_tracks_only_the_current_admin_tasks(): void
     {
         $this->createAccomplishmentTables();
         DB::table('helpdesk_accomplishments')->insert([
@@ -751,13 +751,8 @@ class ExampleTest extends TestCase
                 ->has('accomplishments', 2)
                 ->where('accomplishments.0.title', 'Quarterly service update'));
 
-        $response = $this->withSession($session)->get('/admin/accomplishments/report?year=2026&quarter=4');
-        $response->assertOk()->assertDownload('accomplishments-Q4-2026.csv');
-        $csv = $response->streamedContent();
-        $this->assertStringContainsString('Quarterly service update', $csv);
-        $this->assertStringNotContainsString('Private accomplishment', $csv);
-        $this->assertStringNotContainsString('=SUM(1,1)', $csv);
-        $this->assertStringContainsString("'=SUM(1,1)", $this->withSession($session)->get('/admin/accomplishments/report?year=2026&quarter=3')->streamedContent());
+        $this->withSession($session)->get('/admin/accomplishments/report?year=2026&quarter=4')
+            ->assertMethodNotAllowed();
 
         Schema::drop('helpdesk_accomplishments');
     }

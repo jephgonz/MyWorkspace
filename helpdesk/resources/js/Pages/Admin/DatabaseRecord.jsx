@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
+import AdminSettingsNavigation from '../../Components/AdminSettingsNavigation';
 import { appUrl } from '../../url';
 
 function inputType(column) {
@@ -19,12 +20,51 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
         return [field.name, value];
     }));
     const form = useForm({ table, mode, key: keyToken, values: initial });
-    const { errors } = usePage().props;
-    return <DashboardLayout title={mode === 'create' ? 'Add database row' : 'Edit database row'} activePage="database">
-        <div className="dashboard-title-row"><div><p className="eyebrow">{table}</p><h1>{mode === 'create' ? 'Add row' : 'Edit row'}</h1><p className="dashboard-subtitle">Update fields in the selected table.</p></div><Link className="secondary-action" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>← Back to table</Link></div>
-        <section className="admin-card create-user-card"><form className="account-form database-record-form" onSubmit={(event) => { event.preventDefault(); form.post(appUrl('/admin/database/record/save')); }}>
-            {fields.map((field) => <label key={field.name}>{field.name}<input type={inputType(field)} value={form.data.values[field.name] ?? ''} required={!field.nullable && field.default === null} onChange={(event) => form.setData('values', { ...form.data.values, [field.name]: event.target.value })} /><small>{field.type}{field.nullable ? ', optional' : ''}{field.default !== null ? `, default ${field.default}` : ''}</small></label>)}
-            <button className="sign-in-button" type="submit" disabled={form.processing}>{form.processing ? 'Saving…' : 'Save row'}</button>
-        </form></section>
-    </DashboardLayout>;
+
+    return (
+        <DashboardLayout title={mode === 'create' ? 'Add database row' : 'Edit database row'} activePage="settings">
+            <AdminSettingsNavigation activePage="database" />
+            <section className="icloud-section">
+                <div className="icloud-section-head">
+                    <div>
+                        <p className="eyebrow">{table}</p>
+                        <h1 className="icloud-title">{mode === 'create' ? 'Add row' : 'Edit row'}</h1>
+                        <p className="icloud-subtitle">Update fields in the selected table.</p>
+                    </div>
+                    <Link className="icloud-btn-secondary database-page-button" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>← Back to table</Link>
+                </div>
+                <section className="icloud-card p-5">
+                    <form className="account-form database-record-form" onSubmit={(event) => {
+                        event.preventDefault();
+                        form.post(appUrl('/admin/database/record/save'));
+                    }}>
+                        {fields.map((field) => {
+                            const error = form.errors[`values.${field.name}`] || form.errors[field.name];
+                            const id = `database-field-${field.name}`;
+                            return (
+                                <label key={field.name} htmlFor={id}>
+                                    {field.name}
+                                    <input
+                                        id={id}
+                                        className="icloud-input w-full"
+                                        type={inputType(field)}
+                                        value={form.data.values[field.name] ?? ''}
+                                        required={!field.nullable && field.default === null}
+                                        onChange={(event) => form.setData('values', { ...form.data.values, [field.name]: event.target.value })}
+                                    />
+                                    <small>{field.type}{field.nullable ? ', optional' : ''}{field.default !== null ? `, default ${field.default}` : ''}</small>
+                                    {error && <span className="text-[0.75rem] text-icloud-danger" role="alert">{error}</span>}
+                                </label>
+                            );
+                        })}
+                        {form.errors.form && <p className="text-[0.75rem] text-icloud-danger" role="alert">{form.errors.form}</p>}
+                        <div className="form-actions flex flex-wrap items-center gap-3 border-t border-icloud-border pt-4">
+                            <button className="icloud-btn" type="submit" disabled={form.processing}>{form.processing ? 'Saving…' : 'Save row'}</button>
+                            <Link className="icloud-btn-secondary database-page-button" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>Cancel</Link>
+                        </div>
+                    </form>
+                </section>
+            </section>
+        </DashboardLayout>
+    );
 }

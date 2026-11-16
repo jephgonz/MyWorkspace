@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
         base: `${ASSET_URL.replace(/\/+$/, '')}/build/`,
         plugins: [
             laravel({
-                input: ['resources/js/app.jsx'],
+                input: ['resources/css/app.css', 'resources/js/app.jsx'],
                 refresh: true,
             }),
             react(),

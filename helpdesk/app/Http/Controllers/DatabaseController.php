@@ -85,7 +85,7 @@ class DatabaseController extends Controller
             'backupStatus' => $backupStatus,
             'backupChanges' => $backupChanges,
             'backupSkippedTables' => $backupSkippedTables,
-            'activePage' => 'database',
+            'activePage' => 'settings',
         ]);
     }
 
