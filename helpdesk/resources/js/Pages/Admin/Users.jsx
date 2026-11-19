@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { router, useForm, usePage } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
-import AdminSettingsNavigation from '../../Components/AdminSettingsNavigation';
 import { appUrl } from '../../url';
 
 export default function Users({ users = [] }) {
@@ -19,8 +18,7 @@ export default function Users({ users = [] }) {
     };
 
     return (
-        <DashboardLayout title="Admin accounts" activePage="settings">
-            <AdminSettingsNavigation activePage="accounts" />
+        <DashboardLayout title="Admin accounts" activePage="users">
             <section className="icloud-section">
                 <div className="icloud-section-head">
                     <div>

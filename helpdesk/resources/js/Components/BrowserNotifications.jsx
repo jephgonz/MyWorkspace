@@ -98,7 +98,7 @@ export default function BrowserNotifications({ userId }) {
                     if (seen.has(event.id)) continue;
                     const notification = new window.Notification(event.title, {
                         body: event.body,
-                        icon: appUrl('/public/assets/images/SP.ico'),
+                        icon: appUrl('/assets/images/SP.ico'),
                         tag: event.id,
                     });
                     notification.onclick = () => {

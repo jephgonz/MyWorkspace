@@ -18,8 +18,9 @@ class AccomplishmentController extends Controller
             $accomplishments = DB::table('helpdesk_accomplishments')
                 ->where('created_by', $request->session()->get('user.id'))
                 ->orderByRaw("CASE status WHEN 'todo' THEN 0 ELSE 1 END")
-                ->orderByRaw('CASE WHEN due_date IS NULL THEN 1 ELSE 0 END')
-                ->orderBy('due_date')
+                ->orderByRaw("CASE WHEN status = 'todo' AND due_date IS NULL THEN 1 ELSE 0 END")
+                ->orderByRaw("CASE WHEN status = 'todo' THEN due_date END ASC")
+                ->orderByRaw("CASE WHEN status = 'completed' THEN completed_at END DESC")
                 ->orderByDesc('created_at')
                 ->get([
                     'id',

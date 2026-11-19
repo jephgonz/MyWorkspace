@@ -11,8 +11,7 @@ export default function Login() {
             <Head title="Administrator sign in" />
             <main className="icloud-page min-h-screen flex items-center justify-center px-4">
                 <div className="icloud-card icloud-login-card w-full max-w-md p-6">
-                    <div className="icloud-login-brand flex items-center gap-3 mb-7">
-                        <span className="icloud-brand-mark"><img src={appUrl('/public/assets/images/SP.ico')} alt="" /></span>
+                    <div className="icloud-login-brand mb-7">
                         <span className="icloud-brand-copy"><strong>Jephthah's Workbench</strong><small>Administrator access</small></span>
                     </div>
                     <h1 className="text-[1.5rem] font-bold text-icloud-text mb-1">Sign in</h1>

@@ -737,6 +737,9 @@ class ExampleTest extends TestCase
     {
         $this->createAccomplishmentTables();
         DB::table('helpdesk_accomplishments')->insert([
+            ['created_by' => 1, 'title' => 'Todo without due date', 'description' => null, 'due_date' => null, 'status' => 'todo', 'completed_at' => null, 'created_at' => '2026-10-20 10:00:00', 'updated_at' => '2026-10-20 10:00:00'],
+            ['created_by' => 1, 'title' => 'Todo with due date', 'description' => null, 'due_date' => '2026-11-06', 'status' => 'todo', 'completed_at' => null, 'created_at' => '2026-10-19 10:00:00', 'updated_at' => '2026-10-19 10:00:00'],
+            ['created_by' => 1, 'title' => 'Recently completed', 'description' => null, 'due_date' => '2026-10-01', 'status' => 'completed', 'completed_at' => '2026-11-03 10:00:00', 'created_at' => '2026-10-18 10:00:00', 'updated_at' => '2026-11-03 10:00:00'],
             ['created_by' => 1, 'title' => 'Quarterly service update', 'description' => 'Published helpdesk updates.', 'due_date' => '2026-11-30', 'status' => 'completed', 'completed_at' => '2026-11-02 10:00:00', 'created_at' => '2026-10-25 10:00:00', 'updated_at' => '2026-11-02 10:00:00'],
             ['created_by' => 1, 'title' => '=SUM(1,1)', 'description' => null, 'due_date' => null, 'status' => 'completed', 'completed_at' => '2026-08-02 10:00:00', 'created_at' => '2026-08-01 10:00:00', 'updated_at' => '2026-08-02 10:00:00'],
             ['created_by' => 2, 'title' => 'Private accomplishment', 'description' => null, 'due_date' => null, 'status' => 'completed', 'completed_at' => '2026-11-02 10:00:00', 'created_at' => '2026-10-25 10:00:00', 'updated_at' => '2026-11-02 10:00:00'],
@@ -748,8 +751,12 @@ class ExampleTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Admin/Accomplishments')
                 ->where('activePage', 'accomplishments')
-                ->has('accomplishments', 2)
-                ->where('accomplishments.0.title', 'Quarterly service update'));
+                ->has('accomplishments', 5)
+                ->where('accomplishments.0.title', 'Todo with due date')
+                ->where('accomplishments.1.title', 'Todo without due date')
+                ->where('accomplishments.2.title', 'Recently completed')
+                ->where('accomplishments.3.title', 'Quarterly service update')
+                ->where('accomplishments.4.title', '=SUM(1,1)'));
 
         $this->withSession($session)->get('/admin/accomplishments/report?year=2026&quarter=4')
             ->assertMethodNotAllowed();

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
-import AdminSettingsNavigation from '../../Components/AdminSettingsNavigation';
 import FilePicker from '../../Components/FilePicker';
 import { appUrl } from '../../url';
 
@@ -143,8 +142,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
     const backupStateLabel = backupStatus === 'current' ? 'Backup current' : backupStatus === 'outdated' ? 'Backup outdated' : backupStatus === 'needs_attention' ? 'Schema needs attention' : 'Aiven unavailable';
     const connectionDotClass = `w-2 h-2 rounded-full${connected ? ' bg-green-500' : ' bg-red-500'}`;
 
-    return <DashboardLayout title="Local database" activePage="settings">
-        <AdminSettingsNavigation activePage="database" />
+    return <DashboardLayout title="Local database" activePage="database">
         <section className="icloud-section">
             <div className="icloud-section-head flex flex-col lg:flex-row lg:items-center gap-4">
                 <div>
@@ -155,14 +153,22 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                 <div className="title-actions flex items-center gap-2"><a className="icloud-btn-secondary" href="https://console.aiven.io/" target="_blank" rel="noopener noreferrer">Aiven Console <span aria-hidden="true">→</span></a><a className="icloud-btn-secondary" href={appUrl('/admin/database')}>↻ Refresh</a></div>
             </div>
             <section className="admin-card database-sync-card icloud-card p-0 mt-6" aria-label="Aiven database backup and restore">
-                <div className="admin-card-heading p-5 border-b border-icloud-border flex items-center justify-between"><div><span className="step-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Local primary · Aiven backup</span><h2 className="text-lg font-bold text-icloud-text">Backup and restore</h2><p className="text-[0.8rem] text-icloud-text-secondary">Local SQLite is the live database. Back up copies local data to Aiven; restore replaces local data with the Aiven copy. Both operations preview all managed tables and require confirmation.</p></div><span className={backupStateClass}><span className="w-1.5 h-1.5 rounded-full bg-current" /><span>{backupStateLabel}</span></span></div>
-                <p className="database-backup-status-detail p-5 border-b border-icloud-border/50 text-[0.8rem] text-icloud-text-secondary">{backupStatus === 'current'
-                    ? 'Aiven matches the local primary database.'
-                    : backupStatus === 'outdated'
-                        ? `${backupChanges.toLocaleString()} rows differ. Local is authoritative; back up to refresh Aiven.`
-                        : backupStatus === 'needs_attention'
-                            ? `The database needs attention${backupSkippedTables.length ? ` (${backupSkippedTables.join(', ')})` : ' or exceeds the comparison limit'}.`
-                            : 'Could not compare local SQLite with Aiven. Check the Aiven connection settings.'}</p>
+                <div className="admin-card-heading database-backup-heading p-5 border-b border-icloud-border flex items-center justify-between"><div className="database-backup-heading-copy"><span className="step-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Local primary · Aiven backup</span><h2 className="text-lg font-bold text-icloud-text">Backup and restore</h2><p className="text-[0.8rem] text-icloud-text-secondary">Local SQLite is the live database. Back up copies local data to Aiven; restore replaces local data with the Aiven copy. Both operations preview all managed tables and require confirmation.</p></div><span className={backupStateClass}><span className="w-1.5 h-1.5 rounded-full bg-current" /><span>{backupStateLabel}</span></span></div>
+                <div className="database-backup-status-detail p-5 border-b border-icloud-border/50 text-[0.8rem] text-icloud-text-secondary">
+                    {backupStatus === 'outdated' ? <>
+                        <strong className="block text-icloud-text">{backupChanges.toLocaleString()} {backupChanges === 1 ? 'row differs' : 'rows differ'} between Local SQLite and Aiven.</strong>
+                        <span className="block mt-1">Local SQLite is the latest copy. Back up now to update Aiven.</span>
+                    </> : backupStatus === 'current' ? <>
+                        <strong className="block text-icloud-text">Aiven is synchronized with Local SQLite.</strong>
+                        <span className="block mt-1">No rows differ between the two databases.</span>
+                    </> : backupStatus === 'needs_attention' ? <>
+                        <strong className="block text-icloud-text">The database needs attention.</strong>
+                        <span className="block mt-1">{backupSkippedTables.length ? `Review these tables: ${backupSkippedTables.join(', ')}.` : 'The comparison exceeded its limit or found an incompatible table.'}</span>
+                    </> : <>
+                        <strong className="block text-icloud-text">Aiven is unavailable.</strong>
+                        <span className="block mt-1">Could not compare Local SQLite with Aiven. Check the Aiven connection settings.</span>
+                    </>}
+                </div>
                 {errors.clone && <div className="p-5 border-b border-icloud-border/50"><div className="p-3 border border-red-100 bg-red-50 rounded-xl text-[0.8rem] text-red-700" role="alert">{errors.clone}</div></div>}
                 {flash?.backupSnapshot && <p className="p-5 border-b border-icloud-border/50 text-[0.8rem] text-icloud-text-secondary">A private pre-operation snapshot was created. <a href={appUrl(`/admin/database/backup-snapshots/${encodeURIComponent(flash.backupSnapshot)}`)} className="text-icloud-blue hover:underline">Download snapshot</a></p>}
                 {clonePreviewError && <div className="p-5 border-b border-icloud-border/50"><div className="p-3 border border-red-100 bg-red-50 rounded-xl text-[0.8rem] text-red-700" role="alert">{clonePreviewError}</div></div>}

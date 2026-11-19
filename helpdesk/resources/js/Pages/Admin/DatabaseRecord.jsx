@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
-import AdminSettingsNavigation from '../../Components/AdminSettingsNavigation';
 import { appUrl } from '../../url';
 
 function inputType(column) {
@@ -22,8 +21,7 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
     const form = useForm({ table, mode, key: keyToken, values: initial });
 
     return (
-        <DashboardLayout title={mode === 'create' ? 'Add database row' : 'Edit database row'} activePage="settings">
-            <AdminSettingsNavigation activePage="database" />
+        <DashboardLayout title={mode === 'create' ? 'Add database row' : 'Edit database row'} activePage="database">
             <section className="icloud-section">
                 <div className="icloud-section-head">
                     <div>

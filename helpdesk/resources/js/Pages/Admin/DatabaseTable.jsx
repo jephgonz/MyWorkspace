@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
-import AdminSettingsNavigation from '../../Components/AdminSettingsNavigation';
 import ActionIcon from '../../Components/ActionIcon';
 import { appUrl } from '../../url';
 
@@ -21,8 +20,7 @@ function DeleteRow({ table, keyToken }) {
 
 export default function DatabaseTable({ table, columns = [], rows = [], keys = [], editable, canCreate }) {
     return (
-        <DashboardLayout title={`Table: ${table}`} activePage="settings">
-            <AdminSettingsNavigation activePage="database" />
+        <DashboardLayout title={`Table: ${table}`} activePage="database">
             <section className="icloud-section">
                 <div className="icloud-section-head">
                     <div>
