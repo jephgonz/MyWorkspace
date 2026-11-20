@@ -22,17 +22,15 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
 
     return (
         <DashboardLayout title={mode === 'create' ? 'Add database row' : 'Edit database row'} activePage="database">
-            <section className="icloud-section">
-                <div className="icloud-section-head">
-                    <div>
-                        <p className="eyebrow">{table}</p>
-                        <h1 className="icloud-title">{mode === 'create' ? 'Add row' : 'Edit row'}</h1>
-                        <p className="icloud-subtitle">Update fields in the selected table.</p>
-                    </div>
-                    <Link className="icloud-btn-secondary database-page-button" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>← Back to table</Link>
+            <section className="space-y-6">
+                <div className="pb-4 border-b border-black/[0.06]">
+                    <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">{table}</p>
+                    <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">{mode === 'create' ? 'Add row' : 'Edit row'}</h1>
+                    <p className="text-sm text-slate-500 mt-1">Update fields in the selected table.</p>
                 </div>
-                <section className="icloud-card p-5">
-                    <form className="account-form database-record-form" onSubmit={(event) => {
+
+                <section className="icloud-card p-8">
+                    <form className="space-y-6" onSubmit={(event) => {
                         event.preventDefault();
                         form.post(appUrl('/admin/database/record/save'));
                     }}>
@@ -40,8 +38,10 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
                             const error = form.errors[`values.${field.name}`] || form.errors[field.name];
                             const id = `database-field-${field.name}`;
                             return (
-                                <label key={field.name} htmlFor={id}>
-                                    {field.name}
+                                <div key={field.name} className="flex flex-col gap-1.5">
+                                    <label htmlFor={id} className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">
+                                        {field.name}
+                                    </label>
                                     <input
                                         id={id}
                                         className="icloud-input w-full"
@@ -50,15 +50,18 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
                                         required={!field.nullable && field.default === null}
                                         onChange={(event) => form.setData('values', { ...form.data.values, [field.name]: event.target.value })}
                                     />
-                                    <small>{field.type}{field.nullable ? ', optional' : ''}{field.default !== null ? `, default ${field.default}` : ''}</small>
-                                    {error && <span className="text-[0.75rem] text-icloud-danger" role="alert">{error}</span>}
-                                </label>
+                                    <small className="text-[10px] text-slate-400 ml-1">
+                                        {field.type}{field.nullable ? ', optional' : ''}{field.default !== null ? `, default ${field.default}` : ''}
+                                    </small>
+                                    {error && <p className="text-xs text-rose-600 font-medium" role="alert">{error}</p>}
+                                </div>
                             );
                         })}
-                        {form.errors.form && <p className="text-[0.75rem] text-icloud-danger" role="alert">{form.errors.form}</p>}
-                        <div className="form-actions flex flex-wrap items-center gap-3 border-t border-icloud-border pt-4">
-                            <button className="icloud-btn" type="submit" disabled={form.processing}>{form.processing ? 'Saving…' : 'Save row'}</button>
-                            <Link className="icloud-btn-secondary database-page-button" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>Cancel</Link>
+                        {form.errors.form && <p className="text-xs text-rose-600 font-medium" role="alert">{form.errors.form}</p>}
+
+                        <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-black/[0.06]">
+                            <button className="icloud-btn w-full shadow-md" type="submit" disabled={form.processing}>{form.processing ? 'Saving…' : 'Save row'}</button>
+                            <Link className="icloud-btn-secondary w-full" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>Cancel</Link>
                         </div>
                     </form>
                 </section>

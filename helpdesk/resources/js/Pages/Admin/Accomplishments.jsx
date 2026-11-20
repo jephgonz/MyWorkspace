@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { router, useForm } from '@inertiajs/react';
 import DashboardLayout from '../../Components/DashboardLayout';
+import Collapse from '../../Components/Collapse';
 import ActionIcon from '../../Components/ActionIcon';
 import { appUrl } from '../../url';
 
@@ -237,75 +238,146 @@ export default function Accomplishments({ accomplishments = [] }) {
 
     return (
         <DashboardLayout title="Accomplishments" activePage="accomplishments">
-            <section className="icloud-section">
-                <div className="icloud-section-head">
+            <section className="space-y-6">
+                <div className="flex items-center justify-between">
                     <div>
-                        <p className="eyebrow">PERSONAL WORK TRACKER</p>
-                        <h1 className="icloud-title">Accomplishments</h1>
-                        <p className="icloud-subtitle">Track your work and browse completed tasks by week, month, or quarter.</p>
+                        <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Personal Work Tracker</p>
+                        <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">Accomplishments</h1>
+                        <p className="text-sm text-slate-500 mt-1">Track your work and browse completed tasks by week, month, or quarter.</p>
                     </div>
-                    <button className="icloud-btn" type="button" onClick={() => { setEditingTask(null); setShowForm((open) => !open); }}>{showForm ? 'Close form' : '+ Add task'}</button>
+                    <button className="icloud-btn shadow-md" type="button" onClick={() => { setEditingTask(null); setShowForm((open) => !open); }}>{showForm ? 'Close form' : '+ Add task'}</button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                    <article className="accomplishment-stat icloud-card p-4">
-                        <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">To do</p>
-                        <p className="text-2xl font-bold text-icloud-text">{counts.todo}</p>
-                        <p className="text-[0.7rem] text-icloud-text-secondary">Waiting to start</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <article className="icloud-card p-4">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">To do</p>
+                        <p className="text-3xl font-extrabold text-[#1d1d1f] mt-1">{counts.todo}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">Waiting to start</p>
                     </article>
-                    <article className="accomplishment-stat icloud-card p-4">
-                        <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Completed this week</p>
-                        <p className="text-2xl font-bold text-icloud-text">{periodStats.weekCount}</p>
-                        <p className="text-[0.7rem] text-icloud-text-secondary">{periodStats.weekRange}</p>
-                        <CompletionChart items={periodStats.weekItems} label="Completions by day this week" />
+                    <article className="icloud-card p-4">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Completed this week</p>
+                        <p className="text-3xl font-extrabold text-[#1d1d1f] mt-1">{periodStats.weekCount}</p>
+                        <p className="text-xs text-slate-500 mt-0.5 truncate">{periodStats.weekRange}</p>
                     </article>
-                    <article className="accomplishment-stat icloud-card p-4">
-                        <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Completed this month</p>
-                        <p className="text-2xl font-bold text-icloud-text">{periodStats.monthCount}</p>
-                        <p className="text-[0.7rem] text-icloud-text-secondary">{periodStats.monthLabel}</p>
-                        <CompletionChart items={periodStats.monthItems} label="Completions by week this month" />
+                    <article className="icloud-card p-4">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Completed this month</p>
+                        <p className="text-3xl font-extrabold text-[#1d1d1f] mt-1">{periodStats.monthCount}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">{periodStats.monthLabel}</p>
                     </article>
-                    <article className="accomplishment-stat icloud-card p-4">
-                        <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Completed this quarter</p>
-                        <p className="text-2xl font-bold text-icloud-text">{completedThisQuarter}</p>
-                        <p className="text-[0.7rem] text-icloud-text-secondary">For Q{currentQuarter} {currentDate.getFullYear()}</p>
+                    <article className="icloud-card p-4">
+                        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Completed this quarter</p>
+                        <p className="text-3xl font-extrabold text-[#1d1d1f] mt-1">{completedThisQuarter}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">For Q{currentQuarter} {currentDate.getFullYear()}</p>
                     </article>
                 </div>
-                {showForm && <section className="icloud-card p-6 mb-6 accomplishment-editor"><div className="mb-4"><p className="text-[0.75rem] font-medium text-icloud-text-tertiary mb-1">New task</p><h2 className="text-lg font-bold text-icloud-text">Add an accomplishment</h2><p className="text-[0.8rem] text-icloud-text-secondary">Completed tasks are dated automatically so you can find them in the right period.</p></div><AccomplishmentForm key="new" onCancel={closeForm} onSaved={closeForm} /></section>}
-                <section className="icloud-card p-0 accomplishment-board-card">
-                    <div className="accomplishment-heading p-5 border-b border-icloud-border flex items-center justify-between">
+                <Collapse open={showForm}>
+                    <section className="icloud-card p-6 mb-6">
+                        <div className="mb-6">
+                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New task</p>
+                            <h2 className="text-xl font-bold text-[#1d1d1f] mt-1">Add an accomplishment</h2>
+                            <p className="text-sm text-slate-500 mt-1">Completed tasks are dated automatically.</p>
+                        </div>
+                        <AccomplishmentForm key="new" onCancel={closeForm} onSaved={closeForm} />
+                    </section>
+                </Collapse>
+
+                <section className="icloud-card p-0 overflow-hidden">
+                    <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
                         <div>
-                            <p className="text-[0.75rem] font-medium text-icloud-text-tertiary">Your work</p>
-                            <h2 className="text-lg font-bold text-icloud-text">Tasks and accomplishments</h2>
-                            <p className="text-[0.8rem] text-icloud-text-secondary">{counts.completed} completed · {counts.todo} still open</p>
+                            <h2 className="text-lg font-bold text-[#1d1d1f]">Tasks and accomplishments</h2>
+                            <p className="text-xs text-slate-500 mt-1">{counts.completed} completed · {counts.todo} still open</p>
                         </div>
-                        <span className="text-[0.75rem] font-medium text-icloud-text-secondary">{accomplishments.length} total</span>
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{accomplishments.length} total</span>
                     </div>
-                    <div className="accomplishment-toolbar p-5 border-b border-icloud-border/50 flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
-                        <div className="accomplishment-filters flex items-center gap-2" role="group" aria-label="Filter tasks by status">
-                            <span className="accomplishment-filter-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Show</span>
-                            {[['all', 'All'], ['todo', 'To do'], ['completed', 'Completed']].map(([value, label]) => <button key={value} className={`filter-chip px-3 py-1.5 rounded-full border border-icloud-border text-[0.75rem] font-medium transition-colors${statusFilter === value ? ' bg-icloud-blue text-white border-icloud-blue' : ' bg-white text-icloud-text-secondary hover:bg-icloud-bg' }`} type="button" aria-pressed={statusFilter === value} onClick={() => { setStatusFilter(value); if (value !== 'completed') setPeriodFilter('all'); }}>{label}</button>)}
+                    <div className="p-5 border-b border-black/[0.06] flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between bg-slate-50/50">
+                        <div className="flex items-center gap-2" role="group">
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-2">Show</span>
+                            {[['all', 'All'], ['todo', 'To do'], ['completed', 'Completed']].map(([value, label]) => (
+                                <button
+                                    key={value}
+                                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                                        statusFilter === value
+                                            ? 'bg-white border-black/[0.1] text-blue-600 shadow-sm'
+                                            : 'border-transparent text-slate-600 hover:text-black'
+                                    }`}
+                                    type="button"
+                                    onClick={() => { setStatusFilter(value); if (value !== 'completed') setPeriodFilter('all'); }}
+                                >
+                                    {label}
+                                </button>
+                            ))}
                         </div>
-                        <div className="accomplishment-period-controls flex items-center gap-3 flex-wrap">
-                            <div className="accomplishment-period-options flex items-center gap-2" role="group" aria-label="Filter completed tasks by period">
-                                <span className="accomplishment-filter-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Completed in</span>
-                                {[['all', 'Any time'], ['week', 'Week'], ['month', 'Month'], ['quarter', 'Quarter']].map(([value, label]) => <button key={value} className={`filter-chip px-3 py-1.5 rounded-full border border-icloud-border text-[0.75rem] font-medium transition-colors${periodFilter === value ? ' bg-icloud-blue text-white border-icloud-blue' : ' bg-white text-icloud-text-secondary hover:bg-icloud-bg' }`} type="button" aria-pressed={periodFilter === value} onClick={() => { setPeriodFilter(value); if (value !== 'all') setStatusFilter('completed'); }}>{label}</button>)}
+                        <div className="flex items-center gap-3 flex-wrap">
+                            <div className="flex items-center gap-2" role="group">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-2">Period</span>
+                                {[['all', 'Any time'], ['week', 'Week'], ['month', 'Month'], ['quarter', 'Quarter']].map(([value, label]) => (
+                                    <button
+                                        key={value}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
+                                            periodFilter === value
+                                                ? 'bg-white border-black/[0.1] text-blue-600 shadow-sm'
+                                                : 'border-transparent text-slate-600 hover:text-black'
+                                        }`}
+                                        type="button"
+                                        onClick={() => { setPeriodFilter(value); if (value !== 'all') setStatusFilter('completed'); }}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
                             </div>
-                            {periodFilter === 'week' && <div className="accomplishment-period-picker week-period-picker flex items-center gap-2"><button className="period-navigation-button w-8 h-8 rounded-lg border border-icloud-border bg-white text-icloud-text text-lg font-medium transition-colors hover:bg-icloud-bg disabled:opacity-40 disabled:cursor-not-allowed" type="button" aria-label="Previous week" onClick={() => shiftSelectedWeek(-1)}>‹</button><span className="text-[0.75rem] font-medium text-icloud-text min-w-[150px] text-center">{weekLabel}</span><button className="period-navigation-button w-8 h-8 rounded-lg border border-icloud-border bg-white text-icloud-text text-lg font-medium transition-colors hover:bg-icloud-bg disabled:opacity-40 disabled:cursor-not-allowed" type="button" aria-label="Next week" disabled={selectedWeek >= dateKey(currentWeekStart)} onClick={() => shiftSelectedWeek(1)}>›</button></div>}
-                            {periodFilter === 'month' && <div className="accomplishment-period-picker flex items-center gap-2"><label className="accomplishment-filter-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Month</label><input aria-label="Completed month" type="month" className="icloud-input w-32" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /></div>}
-                            {periodFilter === 'quarter' && <div className="accomplishment-period-picker flex items-center gap-3"><div className="flex flex-col gap-1"><label className="accomplishment-filter-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Quarter</label><select aria-label="Completed quarter" className="icloud-select w-20" value={selectedQuarter} onChange={(event) => setSelectedQuarter(event.target.value)}>{[1, 2, 3, 4].map((quarter) => <option key={quarter} value={quarter}>Q{quarter}</option>)}</select></div><div className="flex flex-col gap-1"><label className="accomplishment-filter-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Year</label><input aria-label="Completed year" type="number" className="icloud-input w-24" min="2000" max="2100" value={selectedYear} onChange={(event) => setSelectedYear(event.target.value)} /></div></div>}
+                                {periodFilter === 'week' && <div className="flex items-center gap-2"><button className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/[0.1] bg-white text-black hover:bg-slate-50 transition-colors" type="button" onClick={() => shiftSelectedWeek(-1)}>‹</button><span className="text-xs font-semibold text-black min-w-[120px] text-center">{weekLabel}</span><button className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/[0.1] bg-white text-black hover:bg-slate-50 transition-colors disabled:opacity-50" type="button" disabled={selectedWeek >= dateKey(currentWeekStart)} onClick={() => shiftSelectedWeek(1)}>›</button></div>}
+                                {periodFilter === 'month' && <div className="flex items-center gap-2"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Month</label><input type="month" className="h-8 px-2 text-xs rounded-lg border border-black/[0.1]" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /></div>}
+                                {periodFilter === 'quarter' && <div className="flex items-center gap-3"><div className="flex flex-col gap-1"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quarter</label><select className="h-8 px-2 text-xs rounded-lg border border-black/[0.1]" value={selectedQuarter} onChange={(event) => setSelectedQuarter(event.target.value)}>{[1, 2, 3, 4].map((quarter) => <option key={quarter} value={quarter}>Q{quarter}</option>)}</select></div><div className="flex flex-col gap-1"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Year</label><input type="number" className="h-8 px-2 text-xs rounded-lg border border-black/[0.1] w-20" min="2000" max="2100" value={selectedYear} onChange={(event) => setSelectedYear(event.target.value)} /></div></div>}
                         </div>
                     </div>
                     <div className="p-5">
-                        {visibleTasks.length === 0 ? <div className="empty-state text-center py-10"><span className="text-3xl mb-2 block">✓</span><strong className="text-lg font-medium text-icloud-text block">{accomplishments.length === 0 ? 'Your board is ready' : periodFilter !== 'all' ? 'No completed tasks in this period' : 'No tasks in this view'}</strong><p className="mt-1 text-[0.8rem] text-icloud-text-secondary">{accomplishments.length === 0 ? 'Add your first task to start tracking your work.' : periodFilter !== 'all' ? 'Choose another week, month, or quarter to browse completions.' : 'Choose another status filter to see more tasks.'}</p></div> :
-                            <div className="accomplishment-list space-y-3">{visibleTasks.map((task) => <article className="accomplishment-item icloud-card p-4 flex items-start gap-4" key={task.id}>
-                                <div className="accomplishment-item-main flex-1 min-w-0"><div className="accomplishment-item-heading flex items-center gap-2 mb-1"><h3 className="text-sm font-semibold text-icloud-text leading-snug">{task.title}</h3><span className={`accomplishment-status inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[0.7rem] font-semibold border${task.status === 'completed' ? ' border-green-200 bg-green-50 text-green-700' : ' border-blue-200 bg-blue-50 text-blue-700' }`}>{statusLabels[task.status]}</span></div>{task.description && <p className="text-[0.8rem] text-icloud-text-secondary mt-1 whitespace-pre-wrap break-words">{task.description}</p>}<div className="accomplishment-dates flex items-center gap-3 mt-2 text-[0.7rem] text-icloud-text-tertiary">{task.due_date && <span className="flex items-center gap-1">⌚ Due {formatDueDate(task.due_date)}</span>}{task.completed_at && <span className="flex items-center gap-1">✓ Completed {formatDate(task.completed_at)}</span>}</div>{editingTask?.id === task.id && <div className="accomplishment-item-edit mt-4"><AccomplishmentForm key={task.id} task={task} onCancel={() => setEditingTask(null)} onSaved={() => setEditingTask(null)} /></div>}</div>
-                                <div className="accomplishment-actions flex items-center gap-2 shrink-0">
-                                    {task.status !== 'completed' && <button className="task-action complete w-8 h-8 rounded-lg border border-icloud-border bg-white text-icloud-blue flex items-center justify-center transition-colors hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed" aria-label="Mark complete" title="Mark complete" disabled={pendingAction !== null} onClick={() => completeTask(task)}><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6" /></svg></button>}
-                                    <button className="task-action w-8 h-8 rounded-lg border border-icloud-border bg-white text-icloud-text-secondary flex items-center justify-center transition-colors hover:bg-icloud-bg disabled:opacity-40 disabled:cursor-not-allowed" type="button" aria-label={editingTask?.id === task.id ? 'Collapse edit task form' : 'Edit task'} title={editingTask?.id === task.id ? 'Collapse edit form' : 'Edit task'} aria-expanded={editingTask?.id === task.id} aria-controls={editingTask?.id === task.id ? `accomplishment-edit-${task.id}` : undefined} disabled={pendingAction !== null} onClick={() => { setShowForm(false); setEditingTask((current) => current?.id === task.id ? null : task); }}><ActionIcon type="edit" /></button>
-                                    <button className="task-action remove w-8 h-8 rounded-lg border border-icloud-border bg-white text-icloud-text-secondary flex items-center justify-center transition-colors hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed" type="button" aria-label="Remove task" title="Remove task" disabled={pendingAction !== null} onClick={() => removeTask(task)}><ActionIcon type="remove" /></button>
-                                    {pendingAction?.id === task.id && <span className="accomplishment-action-pending text-[0.7rem] text-icloud-text-tertiary">{pendingAction.action === 'complete' ? 'Completing…' : 'Removing…'}</span>}
-                                </div>
-                            </article>)}</div>}
+                        {visibleTasks.length === 0 ? (
+                        <div className="text-center py-16">
+                            <span className="text-4xl mb-3 block">✓</span>
+                            <strong className="text-lg font-medium text-[#1d1d1f] block">{accomplishments.length === 0 ? 'Your board is ready' : 'No tasks in this view'}</strong>
+                            <p className="mt-1 text-sm text-slate-500">{accomplishments.length === 0 ? 'Add your first task to start tracking your work.' : 'Choose another filter to see more tasks.'}</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3 p-5">
+                            {visibleTasks.map((task) => (
+                                <article className="icloud-card p-5 flex items-start gap-4 fade-in-up" key={task.id}>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1.5">
+                                            <h3 className="text-sm font-bold text-[#1d1d1f]">{task.title}</h3>
+                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${task.status === 'completed' ? ' border-emerald-200 bg-emerald-50 text-emerald-700' : ' border-blue-200 bg-blue-50 text-blue-700'}`}>
+                                                {statusLabels[task.status]}
+                                            </span>
+                                        </div>
+                                        {task.description && <p className="text-sm text-slate-600 mt-1">{task.description}</p>}
+                                        <div className="flex items-center gap-4 mt-3 text-[11px] font-medium text-slate-500">
+                                            {task.due_date && <span>Due: {formatDueDate(task.due_date)}</span>}
+                                            {task.completed_at && <span>Completed: {formatDate(task.completed_at)}</span>}
+                                        </div>
+                                        {editingTask?.id === task.id && (
+                                            <Collapse open>
+                                                <div className="mt-4 border-t pt-4">
+                                                    <AccomplishmentForm key={task.id} task={task} onCancel={() => setEditingTask(null)} onSaved={() => setEditingTask(null)} />
+                                                </div>
+                                            </Collapse>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        {task.status !== 'completed' && (
+                                            <button className="w-9 h-9 rounded-lg border border-black/[0.1] bg-white text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors" title="Mark complete" disabled={pendingAction !== null} onClick={() => completeTask(task)}>
+                                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m5 12 4 4L19 6" /></svg>
+                                            </button>
+                                        )}
+                                        <button className="w-9 h-9 rounded-lg border border-black/[0.1] bg-white text-slate-500 flex items-center justify-center hover:bg-slate-50 transition-colors" title="Edit" onClick={() => { setShowForm(false); setEditingTask((current) => current?.id === task.id ? null : task); }}>
+                                            <ActionIcon type="edit" />
+                                        </button>
+                                        <button className="w-9 h-9 rounded-lg border border-black/[0.1] bg-white text-slate-500 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove" onClick={() => removeTask(task)}>
+                                            <ActionIcon type="remove" />
+                                        </button>
+                                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                     </div>
                 </section>
             </section>

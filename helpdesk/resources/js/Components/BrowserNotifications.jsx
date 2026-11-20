@@ -175,20 +175,20 @@ export default function BrowserNotifications({ userId }) {
     return (
         <div className="notification-center" ref={menuRef}>
             <button className="notification-trigger" type="button" aria-label="Notification settings" aria-expanded={open} aria-controls="notification-menu" onClick={() => setOpen((value) => !value)}>
-                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
             </button>
             <section className={`notification-menu${open ? ' is-open' : ''}`} id="notification-menu" aria-hidden={!open} inert={!open}>
-                <div className="notification-menu-heading"><div><strong>Browser notifications</strong><small>Alerts while the workbench is open</small></div><span className={`notification-state${settings.enabled && permission === 'granted' ? ' is-enabled' : ''}`}>{settings.enabled && permission === 'granted' ? 'On' : 'Off'}</span></div>
-                <div className="notification-menu-content">
+                <div className="notification-menu-heading"><div><strong className="text-xs font-semibold text-slate-900">Browser notifications</strong><small className="text-[10px] text-slate-500 font-normal">Alerts while workbench is open</small></div><span className={`notification-state ${settings.enabled && permission === 'granted' ? 'text-blue-600 font-medium' : 'text-slate-400 font-normal'}`}>{settings.enabled && permission === 'granted' ? 'On' : 'Off'}</span></div>
+                <div className="notification-menu-content space-y-3">
                     {!settings.enabled || permission !== 'granted'
-                        ? <button className="sign-in-button notification-enable" type="button" disabled={!loaded || saving} onClick={enableNotifications}>{saving ? 'Saving…' : 'Enable browser alerts'}</button>
-                        : <button className="notification-pause" type="button" disabled={saving} onClick={() => saveSettings({ ...settings, enabled: false })}>{saving ? 'Saving…' : 'Pause all notifications'}</button>}
-                    <fieldset disabled={!loaded || saving || !settings.enabled}>
-                        <legend>Notify me about</legend>
-                        {notificationOptions.map(([key, label]) => <label className="notification-option" key={key}><input type="checkbox" checked={settings[key]} onChange={(event) => saveSettings({ ...settings, [key]: event.target.checked })} /><span>{label}</span></label>)}
+                        ? <button className="w-full h-8 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-sm cursor-pointer" type="button" disabled={!loaded || saving} onClick={enableNotifications}>{saving ? 'Saving…' : 'Enable browser alerts'}</button>
+                        : <button className="w-full h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium transition-all cursor-pointer" type="button" disabled={saving} onClick={() => saveSettings({ ...settings, enabled: false })}>{saving ? 'Saving…' : 'Pause all notifications'}</button>}
+                    <fieldset className="space-y-1.5 pt-1" disabled={!loaded || saving || !settings.enabled}>
+                        <legend className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Notify me about</legend>
+                        {notificationOptions.map(([key, label]) => <label className="flex items-center gap-2 text-xs text-slate-700 cursor-pointer" key={key}><input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5" checked={settings[key]} onChange={(event) => saveSettings({ ...settings, [key]: event.target.checked })} /><span>{label}</span></label>)}
                     </fieldset>
-                    <p className="notification-help">Task reminders appear on the due date.</p>
-                    {error && <p className="notification-error" role="alert">{error}</p>}
+                    <p className="text-[11px] text-slate-500">Task reminders appear on the due date.</p>
+                    {error && <p className="text-[11px] text-rose-600" role="alert">{error}</p>}
                 </div>
             </section>
         </div>

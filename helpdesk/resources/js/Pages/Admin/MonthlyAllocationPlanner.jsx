@@ -113,21 +113,23 @@ export default function MonthlyAllocationPlanner({
 
     return (
         <DashboardLayout title="Monthly CSV plan" activePage="monthly-allocation">
-            <section className="icloud-section">
-                <div className="icloud-section-head mb-6">
-                    <div>
-                        <p className="eyebrow">ADMIN TOOLS</p>
-                        <h1 className="icloud-title">Monthly CSV plan</h1>
-                        <p className="icloud-subtitle">Download a CSV with one row for each weekday in the selected month.</p>
-                    </div>
+            <section className="space-y-6">
+                <div>
+                    <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Admin Tools</p>
+                    <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">Monthly CSV plan</h1>
+                    <p className="text-sm text-slate-500 mt-1">Download a CSV with one row for each weekday in the selected month.</p>
                 </div>
 
-                <section className="admin-card allocation-planner-card icloud-card p-0">
-                    <div className="admin-card-heading p-5 border-b border-icloud-border"><div><span className="step-label text-[0.7rem] font-semibold text-icloud-text-tertiary">Monthly CSV</span><h2 className="text-lg font-bold text-icloud-text">Select a month</h2><p className="allocation-description text-[0.8rem] text-icloud-text-secondary">The CSV matches your example columns: number, datetime, value, refnumber, and ads. It includes weekdays only, uses times from 8:00–11:59 AM, and applies your month-end allocation rule: extra below PHP 500 goes to the last day; PHP 500 or more is split across the final two days.</p></div></div>
+                <section className="icloud-card overflow-hidden">
+                    <div className="p-6 border-b border-black/[0.06]">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Monthly CSV</span>
+                        <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Select a month</h2>
+                        <p className="text-sm text-slate-500 mt-1">The CSV matches your example columns: number, datetime, value, refnumber, and ads. It includes weekdays only, uses times from 8:00–11:59 AM, and applies your month-end allocation rule.</p>
+                    </div>
 
-                    <div className="allocation-controls p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <label className="allocation-field flex flex-col gap-1.5">
-                            <span className="icloud-label">Month</span>
+                    <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50/50">
+                        <label className="flex flex-col gap-1.5">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Month</span>
                             <input
                                 id="allocation-month"
                                 type="month"
@@ -140,8 +142,8 @@ export default function MonthlyAllocationPlanner({
                                 }}
                             />
                         </label>
-                        <label className="allocation-field flex flex-col gap-1.5">
-                            <span className="icloud-label">Monthly target (PHP)</span>
+                        <label className="flex flex-col gap-1.5">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Monthly target (PHP)</span>
                             <input
                                 id="allocation-target"
                                 type="number"
@@ -156,8 +158,8 @@ export default function MonthlyAllocationPlanner({
                                 }}
                             />
                         </label>
-                        <label className="allocation-field flex flex-col gap-1.5">
-                            <span className="icloud-label">Base weekday amount (PHP)</span>
+                        <label className="flex flex-col gap-1.5">
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Base weekday amount (PHP)</span>
                             <input
                                 id="allocation-base-amount"
                                 type="number"
@@ -172,12 +174,15 @@ export default function MonthlyAllocationPlanner({
                                 }}
                             />
                         </label>
-                        <div className="allocation-actions flex flex-col md:flex-row md:items-end gap-3">
-                            <button className="icloud-btn" type="button" onClick={downloadPlan} disabled={processing || !validAmounts}>
+                    </div>
+
+                    <div className="p-6 border-t border-black/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <button className="icloud-btn h-10 px-6 shadow-md" type="button" onClick={downloadPlan} disabled={processing || !validAmounts}>
                                 {processing ? 'Preparing CSV…' : 'Download CSV'}
                             </button>
                             <button
-                                className="icloud-btn-secondary"
+                                className="icloud-btn-secondary h-10 px-6"
                                 type="button"
                                 onClick={() => {
                                     setPreviewRandomization((value) => value + 1);
@@ -188,35 +193,43 @@ export default function MonthlyAllocationPlanner({
                                 Rerandomize preview
                             </button>
                         </div>
-                    </div>
-                    {!validAmounts && <p className="px-5 pb-4"><div className="p-3 border border-red-100 bg-red-50 rounded-xl text-[0.8rem] text-red-700" role="alert">Enter positive whole-peso values for the monthly target and base weekday amount.</div></p>}
-
-                    <div className="allocation-summary p-5 border-t border-icloud-border/50 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Monthly target</span><strong className="text-icloud-text">{formatAmount(validTarget ? numericTarget : 0)}</strong></div>
-                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Weekdays scheduled</span><strong className="text-icloud-text">{plan.length}</strong></div>
-                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Base weekday amount</span><strong className="text-icloud-text">{formatAmount(baseAmount)}</strong></div>
-                        <div><span className="block text-[0.7rem] font-semibold text-icloud-text-tertiary">Final two weekday amounts</span><strong className="text-icloud-text">{finalTwoWeekdayAmounts}</strong></div>
+                        {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
+                        {downloaded && <p className="text-xs text-emerald-600 font-medium">The monthly CSV has been downloaded successfully.</p>}
                     </div>
 
-                    <div className="table-wrap allocation-table-wrap p-5 border-t border-icloud-border/50 overflow-x-auto">
+                    {!validAmounts && <div className="px-6 pb-6"><div className="p-3 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700" role="alert">Enter positive whole-peso values for the monthly target and base weekday amount.</div></div>}
+
+                    <div className="p-6 border-t border-black/[0.06] grid grid-cols-2 md:grid-cols-4 gap-4 text-center bg-white">
+                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monthly target</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{formatAmount(validTarget ? numericTarget : 0)}</strong></div>
+                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Weekdays scheduled</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{plan.length}</strong></div>
+                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Base weekday amount</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{formatAmount(baseAmount)}</strong></div>
+                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Final two weekdays</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{finalTwoWeekdayAmounts}</strong></div>
+                    </div>
+
+                    <div className="overflow-x-auto border-t border-black/[0.06]">
                         <table className="w-full text-left border-collapse text-sm">
-                            <thead><tr className="border-b border-icloud-border/50"><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">CSV date</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Weekday</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Value</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Reference number</th><th className="pb-2 text-[0.7rem] font-semibold text-icloud-text-tertiary">Ad path</th></tr></thead>
-                            <tbody>
+                            <thead>
+                                <tr className="bg-slate-50/50">
+                                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">CSV date</th>
+                                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Weekday</th>
+                                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Value</th>
+                                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Reference number</th>
+                                    <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Ad path</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-black/[0.04]">
                                 {plan.map((entry) => (
-                                    <tr key={entry.date} className="border-b border-icloud-border/50 hover:bg-icloud-bg transition-colors">
-                                        <td className="py-2 text-[0.8rem] text-icloud-text">{entry.date}</td>
-                                        <td className="py-2 text-[0.8rem] text-icloud-text-secondary">{formatDate(entry.date)}</td>
-                                        <td className="py-2 text-[0.8rem] text-icloud-text-secondary">{formatAmount(entry.amount)}</td>
-                                        <td className="py-2 text-[0.8rem] text-icloud-text-secondary">{entry.referenceNumber}</td>
-                                        <td className="allocation-ad-path py-2 text-[0.8rem] text-icloud-text-secondary" title={entry.adPath}>{entry.adPath || 'No ad assets configured'}</td>
+                                    <tr key={entry.date} className="hover:bg-slate-50/80 transition-colors fade-in-up">
+                                        <td className="px-6 py-3.5 text-xs font-bold text-[#1d1d1f]">{entry.date}</td>
+                                        <td className="px-6 py-3.5 text-xs text-slate-600">{formatDate(entry.date)}</td>
+                                        <td className="px-6 py-3.5 text-xs font-semibold text-slate-900">{formatAmount(entry.amount)}</td>
+                                        <td className="px-6 py-3.5 text-xs font-mono text-slate-500">{entry.referenceNumber}</td>
+                                        <td className="px-6 py-3.5 text-xs text-slate-500 truncate max-w-xs" title={entry.adPath}>{entry.adPath || 'No ad assets configured'}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-
-                    {error && <p className="px-5 py-4"><div className="p-3 border border-red-100 bg-red-50 rounded-xl text-[0.8rem] text-red-700" role="alert">{error}</div></p>}
-                    {downloaded && <p className="px-5 py-4 text-[0.8rem] text-green-700 bg-green-50 rounded-xl border border-green-100" role="status">The monthly CSV has been downloaded.</p>}
                 </section>
             </section>
         </DashboardLayout>
