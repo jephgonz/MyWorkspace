@@ -4,6 +4,8 @@ MyWorkspace is a Laravel 12 + Inertia.js + React 19 admin application. Sign in a
 
 **Tech Stack:** PHP 8.2+, Laravel 12, SQLite (primary), Inertia.js, React 19, TailwindCSS 4, Vite 7
 
+**UI Theme:** Apple iCloud-inspired monochrome silver design system — SF Pro Display/Inter fonts, glassmorphism topbar/sidebar, `#fbfbfd` / `#f5f5f7` surfaces, `#0071e3` accent blue
+
 ---
 
 ## Current Database Schema
@@ -44,10 +46,10 @@ Overview of tasks, quick actions, and notification status.
 - **SQL query runner** (read-only SELECT by default; write requires confirmation)
 - **Export** entire SQLite database as `.sqlite` file
 - **Import** `.sqlite` file (replaces local DB; stops app first)
-- **Backup to Aiven MySQL** — preview → confirm → snapshots destination → clones managed tables
-- **Restore from Aiven** — preview → confirm → snapshots local → replaces managed tables
+- **Backup to remote MySQL** — preview → confirm → snapshots destination → clones managed tables
+- **Restore from remote MySQL** — preview → confirm → snapshots local → replaces managed tables
 - **Row-level CRUD** (create/edit/delete records in any table)
-- **Metrics** — row counts, table sizes, Aiven sync status
+- **Metrics** — row counts, table sizes, remote sync status
 - Managed tables: users, settings, notification_settings, accomplishments, migrations
 - 20,000 row cap per table per database
 - Private snapshots in `storage/app/private/database-backups/`
@@ -90,12 +92,12 @@ Overview of tasks, quick actions, and notification status.
 | `APP_TIMEZONE` | Timezone | `Asia/Manila` |
 | `DB_CONNECTION` | Primary DB driver | `sqlite` |
 | `DB_DATABASE` | SQLite path | `database/database.sqlite` |
-| `MYSQL_DATABASE` | Aiven MySQL database name | — |
-| `DB_HOST` | Aiven host | — |
-| `DB_PORT` | Aiven port | `3306` |
-| `DB_USERNAME` | Aiven username | — |
-| `DB_PASSWORD` | Aiven password | — |
-| `DB_SSL_CA` | Aiven CA cert path | `config/certs/ca.pem` |
+| `MYSQL_DATABASE` | Remote MySQL database name | — |
+| `DB_HOST` | Remote MySQL host | — |
+| `DB_PORT` | Remote MySQL port | `3306` |
+| `DB_USERNAME` | Remote MySQL username | — |
+| `DB_PASSWORD` | Remote MySQL password | — |
+| `DB_SSL_CA` | Remote MySQL CA cert path | `config/certs/ca.pem` |
 | `SESSION_DRIVER` | Session driver | `file` |
 | `SESSION_COOKIE` | Cookie name | `myworkspace` |
 | `INITIAL_ADMIN_NAME` | First admin name (setup only) | — |
@@ -198,27 +200,32 @@ All admin routes under `/admin` prefix with `admin` middleware (`EnsureAdmin`).
 | `ProfileController` | update own profile |
 
 ### Services
-- `DatabaseSyncService` — Aiven ↔ SQLite clone logic, preview, snapshots
+- `DatabaseSyncService` — Remote MySQL ↔ SQLite clone logic, preview, snapshots
 - `IdCardGenerator` — GD-based card composition
 
 ### Frontend
 - Entry: `resources/js/app.jsx`
 - Pages: `resources/js/Pages/Admin/*.jsx`
 - Components: `resources/js/Components/`
+- Layout: `resources/js/Components/DashboardLayout.jsx` — topbar + collapsible sidebar with grouped nav, profile dropdown, notification center
 - CSS: `resources/css/app.css` (TailwindCSS 4 via Vite plugin)
+  - `@theme` block defines iCloud palette (`--color-icloud-*`), radii, shadows
+  - `@utility` classes: `icloud-card`, `icloud-btn`, `icloud-input`, `icloud-label`, `icloud-page`, `icloud-login-card`, etc.
+  - Animations: `fade-in-up`, `pop-in`, `animate-fade-in`, collapsible slide-down
 - Build: `npm run build` → `public/build/`
 
 ---
 
 ## Important Notes
 
-1. **SQLite is primary** — Aiven MySQL is backup only, not for app traffic
+1. **SQLite is primary** — Remote MySQL is backup only, not for app traffic
 2. **Email not unique** — Multiple admins can share an email address
 3. **Usernames are unique** — Generated for staff during `bin/migrate.php`
 4. **Destructive migrations** — Several migrations permanently delete tables; they **cannot be rolled back**
 5. **Cache uses file driver** — `CACHE_STORE=file` (not database)
 6. **Private data** — Snapshots, exports, `.sqlite` files contain password hashes; keep secure
 7. **PHP GD + FreeType required** — For SP ID Generator cards
+8. **Design system** — Uses custom `icloud-*` Tailwind utilities (not standard Tailwind); extend via `@utility` in `app.css`, not `tailwind.config.js`
 
 ---
 

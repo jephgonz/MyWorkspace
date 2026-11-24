@@ -4,6 +4,9 @@ import DashboardLayout from '../../Components/DashboardLayout';
 import FilePicker from '../../Components/FilePicker';
 import { appUrl } from '../../url';
 
+// Feature flag: set to true when remote MySQL is configured and sync should be enabled
+const ENABLE_REMOTE_SYNC = false;
+
 function ConnectionMonitor() {
     const [metrics, setMetrics] = useState(null);
     const [history, setHistory] = useState([]);
@@ -139,7 +142,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
     };
 
     const backupStateClass = `database-backup-state inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold${backupStatus === 'current' ? ' border-emerald-200 bg-emerald-50 text-emerald-700' : backupStatus === 'outdated' ? ' border-blue-200 bg-blue-50 text-blue-700' : backupStatus === 'needs_attention' ? ' border-amber-200 bg-amber-50 text-amber-700' : ' border-slate-200 bg-slate-50 text-slate-700'}`;
-    const backupStateLabel = backupStatus === 'current' ? 'Backup current' : backupStatus === 'outdated' ? 'Backup outdated' : backupStatus === 'needs_attention' ? 'Schema needs attention' : 'Aiven unavailable';
+    const backupStateLabel = backupStatus === 'current' ? 'Backup current' : backupStatus === 'outdated' ? 'Backup outdated' : backupStatus === 'needs_attention' ? 'Schema needs attention' : 'Remote DB unavailable';
     const connectionDotClass = `w-2.5 h-2.5 rounded-full ${connected ? 'bg-emerald-500 shadow-[0_0_8px_rgba(52,199,89,0.4)]' : 'bg-rose-500'}`;
 
     return <DashboardLayout title="Local database" activePage="database">
@@ -151,60 +154,72 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                     <p className="text-sm text-slate-500 mt-1">The application uses local SQLite as its primary database.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <a className="icloud-btn-secondary" href="https://console.aiven.io/" target="_blank" rel="noopener noreferrer">Aiven Console <span className="ml-1" aria-hidden="true">→</span></a>
+                    {ENABLE_REMOTE_SYNC && <a className="icloud-btn-secondary" href="#" target="_blank" rel="noopener noreferrer">Remote MySQL Console <span className="ml-1" aria-hidden="true">→</span></a>}
                     <a className="icloud-btn-secondary" href={appUrl('/admin/database')}>↻ Refresh</a>
                 </div>
             </div>
 
-            <section className="admin-card database-sync-card icloud-card p-0" aria-label="Aiven database backup and restore">
-                <div className="admin-card-heading database-backup-heading p-6 border-b border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Local primary · Aiven backup</span>
-                        <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Backup and restore</h2>
-                        <p className="text-sm text-slate-500 mt-1">Local SQLite is the live database. Back up copies local data to Aiven; restore replaces local data with the Aiven copy.</p>
+            {/*
+  ==========================================
+  REMOTE DATABASE SYNC (Remote MySQL Backup & Restore)
+  ==========================================
+  This section is hidden by default. To enable:
+  1. Set ENABLE_REMOTE_SYNC = true at the top of this file
+  2. Configure MySQL connection in .env (DB_HOST, DB_PORT, DB_USERNAME, DB_PASSWORD, DB_SSL_CA)
+  3. Ensure MySQL tables have matching schema (InnoDB engine, primary keys)
+  ==========================================
+*/}
+            {ENABLE_REMOTE_SYNC && (
+                <section className="admin-card database-sync-card icloud-card p-0" aria-label="Remote MySQL database backup and restore">
+                    <div className="admin-card-heading database-backup-heading p-6 border-b border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Local primary · Remote MySQL backup</span>
+                            <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Backup and restore</h2>
+                            <p className="text-sm text-slate-500 mt-1">Local SQLite is the live database. Back up copies local data to remote MySQL; restore replaces local data with the remote copy.</p>
+                        </div>
+                        <span className={backupStateClass}><span className="w-1.5 h-1.5 rounded-full bg-current" /><span>{backupStateLabel}</span></span>
                     </div>
-                    <span className={backupStateClass}><span className="w-1.5 h-1.5 rounded-full bg-current" /><span>{backupStateLabel}</span></span>
-                </div>
-                <div className="database-backup-status-detail p-6 border-b border-slate-200/40 text-sm text-slate-600 bg-slate-50/50">
-                    {backupStatus === 'outdated' ? <>
-                        <strong className="block text-[#1d1d1f] font-bold">{backupChanges.toLocaleString()} {backupChanges === 1 ? 'row differs' : 'rows differ'} between Local SQLite and Aiven.</strong>
-                        <span className="block mt-1">Local SQLite is the latest copy. Back up now to update Aiven.</span>
-                    </> : backupStatus === 'current' ? <>
-                        <strong className="block text-[#1d1d1f] font-bold">Aiven is synchronized with Local SQLite.</strong>
-                        <span className="block mt-1">No rows differ between the two databases.</span>
-                    </> : backupStatus === 'needs_attention' ? <>
-                        <strong className="block text-[#1d1d1f] font-bold">The database needs attention.</strong>
-                        <span className="block mt-1">{backupSkippedTables.length ? `Review these tables: ${backupSkippedTables.join(', ')}.` : 'The comparison exceeded its limit or found an incompatible table.'}</span>
-                    </> : <>
-                        <strong className="block text-[#1d1d1f] font-bold">Aiven is unavailable.</strong>
-                        <span className="block mt-1">Could not compare Local SQLite with Aiven. Check the Aiven connection settings.</span>
+                    <div className="database-backup-status-detail p-6 border-b border-slate-200/40 text-sm text-slate-600 bg-slate-50/50">
+                        {backupStatus === 'outdated' ? <>
+                            <strong className="block text-[#1d1d1f] font-bold">{backupChanges.toLocaleString()} {backupChanges === 1 ? 'row differs' : 'rows differ'} between Local SQLite and Remote MySQL.</strong>
+                            <span className="block mt-1">Local SQLite is the latest copy. Back up now to update Remote MySQL.</span>
+                        </> : backupStatus === 'current' ? <>
+                            <strong className="block text-[#1d1d1f] font-bold">Remote MySQL is synchronized with Local SQLite.</strong>
+                            <span className="block mt-1">No rows differ between the two databases.</span>
+                        </> : backupStatus === 'needs_attention' ? <>
+                            <strong className="block text-[#1d1d1f] font-bold">The database needs attention.</strong>
+                            <span className="block mt-1">{backupSkippedTables.length ? `Review these tables: ${backupSkippedTables.join(', ')}.` : 'The comparison exceeded its limit or found an incompatible table.'}</span>
+                        </> : <>
+                            <strong className="block text-[#1d1d1f] font-bold">Remote MySQL is unavailable.</strong>
+                            <span className="block mt-1">Could not compare Local SQLite with Remote MySQL. Check the remote connection settings.</span>
+                        </>}
+                    </div>
+                    {errors.clone && <div className="p-6 border-b border-slate-200/40"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{errors.clone}</div></div>}
+                    {flash?.backupSnapshot && <p className="p-6 border-b border-slate-200/40 text-xs text-slate-600">A private pre-operation snapshot was created. <a href={appUrl(`/admin/database/backup-snapshots/${encodeURIComponent(flash.backupSnapshot)}`)} className="text-blue-600 font-semibold hover:underline">Download snapshot</a></p>}
+                    {clonePreviewError && <div className="p-6 border-b border-slate-200/40"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{clonePreviewError}</div></div>}
+                    <div className="database-backup-actions p-6 border-b border-slate-200/40 flex flex-col sm:flex-row gap-3">
+                        <button className="icloud-btn flex-1 shadow-md" type="button" disabled={clonePreviewing} onClick={() => previewClone('backup')}>{clonePreviewing && cloneForm.data.operation === 'backup' ? 'Comparing…' : 'Back up local to Remote MySQL'}</button>
+                        <button className="icloud-btn-secondary flex-1" type="button" disabled={clonePreviewing} onClick={() => previewClone('restore')}>{clonePreviewing && cloneForm.data.operation === 'restore' ? 'Comparing…' : 'Restore Remote MySQL to local'}</button>
+                    </div>
+                    {clonePreview && <>
+                        <p className="p-6 border-b border-slate-200/40 text-sm text-slate-600">Clone <strong className="text-[#1d1d1f] font-bold">{clonePreview.source === 'local' ? 'Local SQLite' : 'Remote MySQL'}</strong> → <strong className="text-[#1d1d1f] font-bold">{clonePreview.target === 'local' ? 'Local SQLite' : 'Remote MySQL'}</strong>. Destination table data will be replaced.</p>
+                        <div className="table-wrap database-sync-table-wrap p-6"><table className="w-full text-left border-collapse text-sm database-sync-table"><thead><tr className="border-b border-slate-200/60"><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Table</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Source rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Result</th></tr></thead><tbody className="divide-y divide-slate-200/40">{clonePreview.tables.map((table) => {
+                        const matches = table.status === 'ready' && table.new_rows + table.changed_rows + table.target_only_rows === 0;
+                        const result = table.status !== 'ready'
+                            ? table.status.replaceAll('_', ' ')
+                            : matches
+                                ? 'Matches'
+                                : `${table.new_rows.toLocaleString()} added · ${table.changed_rows.toLocaleString()} changed · ${table.target_only_rows.toLocaleString()} removed`;
+                        return <tr key={table.name} className="hover:bg-slate-50/80 transition-colors fade-in-up"><td className="py-3.5 text-xs font-bold text-[#1d1d1f]" data-label="Table">{table.name}</td><td className="py-3.5 text-xs text-slate-600" data-label="Source rows">{table.status === 'ready' ? table.source_rows.toLocaleString() : '—'}</td><td className="py-3.5 text-xs text-slate-600" data-label="Destination rows">{table.status === 'ready' ? table.target_rows.toLocaleString() : '—'}</td><td className="py-3.5" data-label="Result"><span className={resultClass(table, matches)}>{result}</span></td></tr>;
+                    })}</tbody></table></div>
+                        {skippedTables.length > 0 && <p className="p-6 border-b border-slate-200/40 text-xs text-rose-600 font-medium">Clone is blocked until every managed table has the same schema and transactional storage on Remote MySQL. Check migrations and table engines, then preview again.</p>}
+                        {syncableChanges > 0 && skippedTables.length === 0 ? <form className="database-sync-confirm p-6 border-b border-slate-200/40 bg-slate-50/50" onSubmit={submitSync}>
+                            <label className="flex items-start gap-3"><input type="checkbox" checked={cloneForm.data.confirm_clone} onChange={(event) => cloneForm.setData('confirm_clone', event.target.checked)} required className="mt-1 text-blue-600 rounded border-slate-300 focus:ring-blue-500" /><span className="text-xs text-slate-600 leading-relaxed">I reviewed the preview. Replace all destination data in these tables with the source copy. A private snapshot of the destination will be created first.{cloneForm.data.operation === 'restore' ? ' The restore is blocked if it would remove or disable your current administrator account.' : ''}</span></label>
+                            <button className="mt-4 icloud-btn w-full shadow-md" type="submit" disabled={cloneForm.processing || !cloneForm.data.confirm_clone}>{cloneForm.processing ? 'Cloning…' : cloneForm.data.operation === 'backup' ? 'Confirm backup to Remote MySQL' : 'Confirm restore to local'}</button>
+                        </form> : skippedTables.length === 0 ? <p className="p-6 border-b border-slate-200/40 text-xs text-slate-500 font-medium">Both copies already match. No clone is needed.</p> : null}
                     </>}
-                </div>
-                {errors.clone && <div className="p-6 border-b border-slate-200/40"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{errors.clone}</div></div>}
-                {flash?.backupSnapshot && <p className="p-6 border-b border-slate-200/40 text-xs text-slate-600">A private pre-operation snapshot was created. <a href={appUrl(`/admin/database/backup-snapshots/${encodeURIComponent(flash.backupSnapshot)}`)} className="text-blue-600 font-semibold hover:underline">Download snapshot</a></p>}
-                {clonePreviewError && <div className="p-6 border-b border-slate-200/40"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{clonePreviewError}</div></div>}
-                <div className="database-backup-actions p-6 border-b border-slate-200/40 flex flex-col sm:flex-row gap-3">
-                    <button className="icloud-btn flex-1 shadow-md" type="button" disabled={clonePreviewing} onClick={() => previewClone('backup')}>{clonePreviewing && cloneForm.data.operation === 'backup' ? 'Comparing…' : 'Back up local to Aiven'}</button>
-                    <button className="icloud-btn-secondary flex-1" type="button" disabled={clonePreviewing} onClick={() => previewClone('restore')}>{clonePreviewing && cloneForm.data.operation === 'restore' ? 'Comparing…' : 'Restore Aiven to local'}</button>
-                </div>
-                {clonePreview && <>
-                    <p className="p-6 border-b border-slate-200/40 text-sm text-slate-600">Clone <strong className="text-[#1d1d1f] font-bold">{clonePreview.source === 'local' ? 'Local SQLite' : 'Aiven MySQL'}</strong> → <strong className="text-[#1d1d1f] font-bold">{clonePreview.target === 'local' ? 'Local SQLite' : 'Aiven MySQL'}</strong>. Destination table data will be replaced.</p>
-                    <div className="table-wrap database-sync-table-wrap p-6"><table className="w-full text-left border-collapse text-sm database-sync-table"><thead><tr className="border-b border-slate-200/60"><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Table</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Source rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Result</th></tr></thead><tbody className="divide-y divide-slate-200/40">{clonePreview.tables.map((table) => {
-                    const matches = table.status === 'ready' && table.new_rows + table.changed_rows + table.target_only_rows === 0;
-                    const result = table.status !== 'ready'
-                        ? table.status.replaceAll('_', ' ')
-                        : matches
-                            ? 'Matches'
-                            : `${table.new_rows.toLocaleString()} added · ${table.changed_rows.toLocaleString()} changed · ${table.target_only_rows.toLocaleString()} removed`;
-                    return <tr key={table.name} className="hover:bg-slate-50/80 transition-colors fade-in-up"><td className="py-3.5 text-xs font-bold text-[#1d1d1f]" data-label="Table">{table.name}</td><td className="py-3.5 text-xs text-slate-600" data-label="Source rows">{table.status === 'ready' ? table.source_rows.toLocaleString() : '—'}</td><td className="py-3.5 text-xs text-slate-600" data-label="Destination rows">{table.status === 'ready' ? table.target_rows.toLocaleString() : '—'}</td><td className="py-3.5" data-label="Result"><span className={resultClass(table, matches)}>{result}</span></td></tr>;
-                })}</tbody></table></div>
-                {skippedTables.length > 0 && <p className="p-6 border-b border-slate-200/40 text-xs text-rose-600 font-medium">Clone is blocked until every managed table has the same schema and transactional storage on Aiven. Check migrations and table engines, then preview again.</p>}
-                {syncableChanges > 0 && skippedTables.length === 0 ? <form className="database-sync-confirm p-6 border-b border-slate-200/40 bg-slate-50/50" onSubmit={submitSync}>
-                    <label className="flex items-start gap-3"><input type="checkbox" checked={cloneForm.data.confirm_clone} onChange={(event) => cloneForm.setData('confirm_clone', event.target.checked)} required className="mt-1 text-blue-600 rounded border-slate-300 focus:ring-blue-500" /><span className="text-xs text-slate-600 leading-relaxed">I reviewed the preview. Replace all destination data in these tables with the source copy. A private snapshot of the destination will be created first.{cloneForm.data.operation === 'restore' ? ' The restore is blocked if it would remove or disable your current administrator account.' : ''}</span></label>
-                    <button className="mt-4 icloud-btn w-full shadow-md" type="submit" disabled={cloneForm.processing || !cloneForm.data.confirm_clone}>{cloneForm.processing ? 'Cloning…' : cloneForm.data.operation === 'backup' ? 'Confirm backup to Aiven' : 'Confirm restore to local'}</button>
-                </form> : skippedTables.length === 0 ? <p className="p-6 border-b border-slate-200/40 text-xs text-slate-500 font-medium">Both copies already match. No clone is needed.</p> : null}
-            </>}
-            </section>
+                </section>
+            )}
 
             <section className="admin-card accounts-card database-tables-card icloud-card p-0">
                 <div className="admin-card-heading accounts-heading p-6 border-b border-slate-200/60 flex items-center justify-between">
