@@ -51,9 +51,9 @@ try {
         throw new RuntimeException('The helpdesk role column does not have the expected admin/staff values.');
     }
 
-    fwrite(STDOUT, "Workbench administrator account schema is ready. Existing staff usernames and roles were migrated where needed, and duplicate emails are allowed.\n");
+    fwrite(STDOUT, "MyWorkspace administrator account schema is ready. Existing staff usernames and roles were migrated where needed, and duplicate emails are allowed.\n");
 } catch (Throwable $exception) {
-    error_log('Workbench account migration error: ' . $exception->getMessage());
+    error_log('MyWorkspace account migration error: ' . $exception->getMessage());
     fwrite(STDERR, "Migration failed. Check database access and the PHP error log.\n");
     exit(1);
 }

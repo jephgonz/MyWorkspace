@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "jephthah/workbench",
+    "name": "myworkspace/app",
     "type": "project",
-    "description": "Jephthah's Workbench application.",
+    "description": "MyWorkspace application.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {

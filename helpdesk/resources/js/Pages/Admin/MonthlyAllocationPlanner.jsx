@@ -121,7 +121,7 @@ export default function MonthlyAllocationPlanner({
                 </div>
 
                 <section className="icloud-card overflow-hidden">
-                    <div className="p-6 border-b border-black/[0.06]">
+                    <div className="p-6 border-b border-slate-200/60">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Monthly CSV</span>
                         <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Select a month</h2>
                         <p className="text-sm text-slate-500 mt-1">The CSV matches your example columns: number, datetime, value, refnumber, and ads. It includes weekdays only, uses times from 8:00–11:59 AM, and applies your month-end allocation rule.</p>
@@ -176,7 +176,7 @@ export default function MonthlyAllocationPlanner({
                         </label>
                     </div>
 
-                    <div className="p-6 border-t border-black/[0.06] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="p-6 border-t border-slate-200/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
                             <button className="icloud-btn h-10 px-6 shadow-md" type="button" onClick={downloadPlan} disabled={processing || !validAmounts}>
                                 {processing ? 'Preparing CSV…' : 'Download CSV'}
@@ -199,14 +199,14 @@ export default function MonthlyAllocationPlanner({
 
                     {!validAmounts && <div className="px-6 pb-6"><div className="p-3 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700" role="alert">Enter positive whole-peso values for the monthly target and base weekday amount.</div></div>}
 
-                    <div className="p-6 border-t border-black/[0.06] grid grid-cols-2 md:grid-cols-4 gap-4 text-center bg-white">
-                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monthly target</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{formatAmount(validTarget ? numericTarget : 0)}</strong></div>
-                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Weekdays scheduled</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{plan.length}</strong></div>
-                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Base weekday amount</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{formatAmount(baseAmount)}</strong></div>
-                        <div className="p-3 rounded-xl bg-slate-50 border border-black/[0.04]"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Final two weekdays</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{finalTwoWeekdayAmounts}</strong></div>
+                    <div className="p-6 border-t border-slate-200/60 grid grid-cols-2 md:grid-cols-4 gap-4 text-center bg-white">
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/40"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monthly target</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{formatAmount(validTarget ? numericTarget : 0)}</strong></div>
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/40"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Weekdays scheduled</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{plan.length}</strong></div>
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/40"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Base weekday amount</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{formatAmount(baseAmount)}</strong></div>
+                        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/40"><span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Final two weekdays</span><strong className="text-base font-extrabold text-[#1d1d1f] mt-0.5 block">{finalTwoWeekdayAmounts}</strong></div>
                     </div>
 
-                    <div className="overflow-x-auto border-t border-black/[0.06]">
+                    <div className="overflow-x-auto border-t border-slate-200/60">
                         <table className="w-full text-left border-collapse text-sm">
                             <thead>
                                 <tr className="bg-slate-50/50">
@@ -217,7 +217,7 @@ export default function MonthlyAllocationPlanner({
                                     <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Ad path</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-black/[0.04]">
+                            <tbody className="divide-y divide-slate-200/40">
                                 {plan.map((entry) => (
                                     <tr key={entry.date} className="hover:bg-slate-50/80 transition-colors fade-in-up">
                                         <td className="px-6 py-3.5 text-xs font-bold text-[#1d1d1f]">{entry.date}</td>

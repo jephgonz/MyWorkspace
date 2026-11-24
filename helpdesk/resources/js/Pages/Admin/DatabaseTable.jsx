@@ -11,7 +11,7 @@ function DeleteRow({ table, keyToken }) {
             event.preventDefault();
             if (window.confirm('Delete this row?')) form.post(appUrl('/admin/database/record/delete'));
         }}>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-transparent hover:border-black/[0.1] hover:bg-slate-50 text-slate-500 hover:text-rose-600 transition-colors" type="submit" aria-label="Delete row" title="Delete row" disabled={form.processing}>
+            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-transparent hover:border-slate-200/80 hover:bg-slate-50 text-slate-500 hover:text-rose-600 transition-colors" type="submit" aria-label="Delete row" title="Delete row" disabled={form.processing}>
                 <ActionIcon type="remove" />
             </button>
         </form>
@@ -22,7 +22,7 @@ export default function DatabaseTable({ table, columns = [], rows = [], keys = [
     return (
         <DashboardLayout title={`Table: ${table}`} activePage="database">
             <section className="space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/[0.06]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/60">
                     <div>
                         <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Database Table</p>
                         <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">{table}</h1>
@@ -44,12 +44,12 @@ export default function DatabaseTable({ table, columns = [], rows = [], keys = [
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-max border-collapse text-left text-sm">
                                 <thead>
-                                    <tr className="border-b border-black/[0.06]">
+                                    <tr className="border-b border-slate-200/60">
                                         {columns.map((column) => <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider" key={column.name}>{column.name}</th>)}
                                         {editable && <th className="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Actions</th>}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-black/[0.04]">
+                                <tbody className="divide-y divide-slate-200/40">
                                     {rows.map((row, index) => (
                                         <tr className="hover:bg-slate-50/80 transition-colors fade-in-up" key={keys[index] ?? index}>
                                             {columns.map((column) => (
@@ -60,7 +60,7 @@ export default function DatabaseTable({ table, columns = [], rows = [], keys = [
                                             {editable && (
                                                 <td className="px-6 py-4">
                                                     <div className="flex items-center gap-1">
-                                                        <Link className="w-8 h-8 flex items-center justify-center rounded-lg border border-transparent hover:border-black/[0.1] hover:bg-slate-50 text-slate-500 hover:text-blue-600 transition-colors" aria-label="Edit row" title="Edit row" href={`${appUrl('/admin/database/record/edit')}?table=${encodeURIComponent(table)}&key=${encodeURIComponent(keys[index])}`}>
+                                                        <Link className="w-8 h-8 flex items-center justify-center rounded-lg border border-transparent hover:border-slate-200/80 hover:bg-slate-50 text-slate-500 hover:text-blue-600 transition-colors" aria-label="Edit row" title="Edit row" href={`${appUrl('/admin/database/record/edit')}?table=${encodeURIComponent(table)}&key=${encodeURIComponent(keys[index])}`}>
                                                             <ActionIcon type="edit" />
                                                         </Link>
                                                         {table !== 'helpdesk_users' && <DeleteRow table={table} keyToken={keys[index]} />}

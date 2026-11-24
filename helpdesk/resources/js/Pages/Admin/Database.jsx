@@ -70,10 +70,10 @@ function ConnectionMonitor() {
     const statusClass = `database-live-status inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[0.75rem] font-medium${error ? ' border-rose-200 bg-rose-50 text-rose-700' : ' border-blue-200 bg-blue-50 text-blue-700'}`;
 
     return <section className="database-monitor icloud-card p-0" aria-label="Live database connection metrics">
-        <div className="database-live-summary grid grid-cols-1 md:grid-cols-3 gap-4 p-5 border-b border-black/[0.06]">
-            <article className="database-info-card p-4 rounded-xl border border-black/[0.06] bg-white"><span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Current connections</span><strong className="text-2xl font-extrabold text-[#1d1d1f] block">{metrics?.connected ?? '—'}</strong><small className="text-xs text-slate-500">Open client threads</small></article>
-            <article className="database-info-card p-4 rounded-xl border border-black/[0.06] bg-white"><span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Active threads</span><strong className="text-2xl font-extrabold text-[#1d1d1f] block">{metrics?.running ?? '—'}</strong><small className="text-xs text-slate-500">Threads processing work</small></article>
-            <article className="database-info-card p-4 rounded-xl border border-black/[0.06] bg-white"><span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Peak connections</span><strong className="text-2xl font-extrabold text-[#1d1d1f] block">{metrics?.maxUsed ?? '—'}</strong><small className="text-xs text-slate-500">{metrics?.maxConnections ?? '—'} configured maximum</small></article>
+        <div className="database-live-summary grid grid-cols-1 md:grid-cols-3 gap-4 p-5 border-b border-slate-200/60">
+            <article className="database-info-card p-4 rounded-xl border border-slate-200/60 bg-white"><span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Current connections</span><strong className="text-2xl font-extrabold text-[#1d1d1f] block">{metrics?.connected ?? '—'}</strong><small className="text-xs text-slate-500">Open client threads</small></article>
+            <article className="database-info-card p-4 rounded-xl border border-slate-200/60 bg-white"><span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Active threads</span><strong className="text-2xl font-extrabold text-[#1d1d1f] block">{metrics?.running ?? '—'}</strong><small className="text-xs text-slate-500">Threads processing work</small></article>
+            <article className="database-info-card p-4 rounded-xl border border-slate-200/60 bg-white"><span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Peak connections</span><strong className="text-2xl font-extrabold text-[#1d1d1f] block">{metrics?.maxUsed ?? '—'}</strong><small className="text-xs text-slate-500">{metrics?.maxConnections ?? '—'} configured maximum</small></article>
         </div>
         <section className="admin-card database-chart-card p-6"><div className="admin-card-heading accounts-heading flex items-center justify-between mb-4"><div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Live server status</span><h2 className="text-lg font-bold text-[#1d1d1f] mt-0.5">Database connections</h2><p className="text-xs text-slate-500 mt-0.5">Connection counts sampled every five seconds.</p></div><span className={statusClass}><span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" /><span>{error || (metrics ? 'Live' : 'Connecting…')}</span></span></div><div className="database-chart-wrap h-28 w-full"><canvas ref={canvas} aria-label="Live chart of MySQL client connections" className="w-full h-full" /></div><div className="database-chart-footer mt-4 flex justify-between text-xs text-slate-500 font-medium"><span>Recent samples</span><span>{metrics ? new Date(metrics.sampledAt).toLocaleTimeString() : 'Waiting for first sample'}</span></div></section>
     </section>;
@@ -144,7 +144,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
 
     return <DashboardLayout title="Local database" activePage="database">
         <section className="space-y-6">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-black/[0.06]">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-200/60">
                 <div>
                     <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">System Administration</p>
                     <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">Local database</h1>
@@ -157,7 +157,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
             </div>
 
             <section className="admin-card database-sync-card icloud-card p-0" aria-label="Aiven database backup and restore">
-                <div className="admin-card-heading database-backup-heading p-6 border-b border-black/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="admin-card-heading database-backup-heading p-6 border-b border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Local primary · Aiven backup</span>
                         <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Backup and restore</h2>
@@ -165,7 +165,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                     </div>
                     <span className={backupStateClass}><span className="w-1.5 h-1.5 rounded-full bg-current" /><span>{backupStateLabel}</span></span>
                 </div>
-                <div className="database-backup-status-detail p-6 border-b border-black/[0.04] text-sm text-slate-600 bg-slate-50/50">
+                <div className="database-backup-status-detail p-6 border-b border-slate-200/40 text-sm text-slate-600 bg-slate-50/50">
                     {backupStatus === 'outdated' ? <>
                         <strong className="block text-[#1d1d1f] font-bold">{backupChanges.toLocaleString()} {backupChanges === 1 ? 'row differs' : 'rows differ'} between Local SQLite and Aiven.</strong>
                         <span className="block mt-1">Local SQLite is the latest copy. Back up now to update Aiven.</span>
@@ -180,16 +180,16 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                         <span className="block mt-1">Could not compare Local SQLite with Aiven. Check the Aiven connection settings.</span>
                     </>}
                 </div>
-                {errors.clone && <div className="p-6 border-b border-black/[0.04]"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{errors.clone}</div></div>}
-                {flash?.backupSnapshot && <p className="p-6 border-b border-black/[0.04] text-xs text-slate-600">A private pre-operation snapshot was created. <a href={appUrl(`/admin/database/backup-snapshots/${encodeURIComponent(flash.backupSnapshot)}`)} className="text-blue-600 font-semibold hover:underline">Download snapshot</a></p>}
-                {clonePreviewError && <div className="p-6 border-b border-black/[0.04]"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{clonePreviewError}</div></div>}
-                <div className="database-backup-actions p-6 border-b border-black/[0.04] flex flex-col sm:flex-row gap-3">
+                {errors.clone && <div className="p-6 border-b border-slate-200/40"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{errors.clone}</div></div>}
+                {flash?.backupSnapshot && <p className="p-6 border-b border-slate-200/40 text-xs text-slate-600">A private pre-operation snapshot was created. <a href={appUrl(`/admin/database/backup-snapshots/${encodeURIComponent(flash.backupSnapshot)}`)} className="text-blue-600 font-semibold hover:underline">Download snapshot</a></p>}
+                {clonePreviewError && <div className="p-6 border-b border-slate-200/40"><div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700 font-medium" role="alert">{clonePreviewError}</div></div>}
+                <div className="database-backup-actions p-6 border-b border-slate-200/40 flex flex-col sm:flex-row gap-3">
                     <button className="icloud-btn flex-1 shadow-md" type="button" disabled={clonePreviewing} onClick={() => previewClone('backup')}>{clonePreviewing && cloneForm.data.operation === 'backup' ? 'Comparing…' : 'Back up local to Aiven'}</button>
                     <button className="icloud-btn-secondary flex-1" type="button" disabled={clonePreviewing} onClick={() => previewClone('restore')}>{clonePreviewing && cloneForm.data.operation === 'restore' ? 'Comparing…' : 'Restore Aiven to local'}</button>
                 </div>
                 {clonePreview && <>
-                    <p className="p-6 border-b border-black/[0.04] text-sm text-slate-600">Clone <strong className="text-[#1d1d1f] font-bold">{clonePreview.source === 'local' ? 'Local SQLite' : 'Aiven MySQL'}</strong> → <strong className="text-[#1d1d1f] font-bold">{clonePreview.target === 'local' ? 'Local SQLite' : 'Aiven MySQL'}</strong>. Destination table data will be replaced.</p>
-                    <div className="table-wrap database-sync-table-wrap p-6"><table className="w-full text-left border-collapse text-sm database-sync-table"><thead><tr className="border-b border-black/[0.06]"><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Table</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Source rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Result</th></tr></thead><tbody className="divide-y divide-black/[0.04]">{clonePreview.tables.map((table) => {
+                    <p className="p-6 border-b border-slate-200/40 text-sm text-slate-600">Clone <strong className="text-[#1d1d1f] font-bold">{clonePreview.source === 'local' ? 'Local SQLite' : 'Aiven MySQL'}</strong> → <strong className="text-[#1d1d1f] font-bold">{clonePreview.target === 'local' ? 'Local SQLite' : 'Aiven MySQL'}</strong>. Destination table data will be replaced.</p>
+                    <div className="table-wrap database-sync-table-wrap p-6"><table className="w-full text-left border-collapse text-sm database-sync-table"><thead><tr className="border-b border-slate-200/60"><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Table</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Source rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destination rows</th><th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Result</th></tr></thead><tbody className="divide-y divide-slate-200/40">{clonePreview.tables.map((table) => {
                     const matches = table.status === 'ready' && table.new_rows + table.changed_rows + table.target_only_rows === 0;
                     const result = table.status !== 'ready'
                         ? table.status.replaceAll('_', ' ')
@@ -198,16 +198,16 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                             : `${table.new_rows.toLocaleString()} added · ${table.changed_rows.toLocaleString()} changed · ${table.target_only_rows.toLocaleString()} removed`;
                     return <tr key={table.name} className="hover:bg-slate-50/80 transition-colors fade-in-up"><td className="py-3.5 text-xs font-bold text-[#1d1d1f]" data-label="Table">{table.name}</td><td className="py-3.5 text-xs text-slate-600" data-label="Source rows">{table.status === 'ready' ? table.source_rows.toLocaleString() : '—'}</td><td className="py-3.5 text-xs text-slate-600" data-label="Destination rows">{table.status === 'ready' ? table.target_rows.toLocaleString() : '—'}</td><td className="py-3.5" data-label="Result"><span className={resultClass(table, matches)}>{result}</span></td></tr>;
                 })}</tbody></table></div>
-                {skippedTables.length > 0 && <p className="p-6 border-b border-black/[0.04] text-xs text-rose-600 font-medium">Clone is blocked until every managed table has the same schema and transactional storage on Aiven. Check migrations and table engines, then preview again.</p>}
-                {syncableChanges > 0 && skippedTables.length === 0 ? <form className="database-sync-confirm p-6 border-b border-black/[0.04] bg-slate-50/50" onSubmit={submitSync}>
+                {skippedTables.length > 0 && <p className="p-6 border-b border-slate-200/40 text-xs text-rose-600 font-medium">Clone is blocked until every managed table has the same schema and transactional storage on Aiven. Check migrations and table engines, then preview again.</p>}
+                {syncableChanges > 0 && skippedTables.length === 0 ? <form className="database-sync-confirm p-6 border-b border-slate-200/40 bg-slate-50/50" onSubmit={submitSync}>
                     <label className="flex items-start gap-3"><input type="checkbox" checked={cloneForm.data.confirm_clone} onChange={(event) => cloneForm.setData('confirm_clone', event.target.checked)} required className="mt-1 text-blue-600 rounded border-slate-300 focus:ring-blue-500" /><span className="text-xs text-slate-600 leading-relaxed">I reviewed the preview. Replace all destination data in these tables with the source copy. A private snapshot of the destination will be created first.{cloneForm.data.operation === 'restore' ? ' The restore is blocked if it would remove or disable your current administrator account.' : ''}</span></label>
                     <button className="mt-4 icloud-btn w-full shadow-md" type="submit" disabled={cloneForm.processing || !cloneForm.data.confirm_clone}>{cloneForm.processing ? 'Cloning…' : cloneForm.data.operation === 'backup' ? 'Confirm backup to Aiven' : 'Confirm restore to local'}</button>
-                </form> : skippedTables.length === 0 ? <p className="p-6 border-b border-black/[0.04] text-xs text-slate-500 font-medium">Both copies already match. No clone is needed.</p> : null}
+                </form> : skippedTables.length === 0 ? <p className="p-6 border-b border-slate-200/40 text-xs text-slate-500 font-medium">Both copies already match. No clone is needed.</p> : null}
             </>}
             </section>
 
             <section className="admin-card accounts-card database-tables-card icloud-card p-0">
-                <div className="admin-card-heading accounts-heading p-6 border-b border-black/[0.06] flex items-center justify-between">
+                <div className="admin-card-heading accounts-heading p-6 border-b border-slate-200/60 flex items-center justify-between">
                     <div>
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Schema overview</span>
                         <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Tables</h2>
@@ -223,14 +223,14 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                     </div>
                 ) : (
                     <>
-                        <div className="database-table-search p-4 border-b border-black/[0.04] bg-slate-50/50 flex items-center gap-3">
+                        <div className="database-table-search p-4 border-b border-slate-200/40 bg-slate-50/50 flex items-center gap-3">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Filter tables</label>
                             <input id="database-table-search" type="search" className="icloud-input w-72 text-sm" value={tableSearch} onChange={(event) => setTableSearch(event.target.value)} placeholder="Search table names…" />
                         </div>
                         <div className="table-wrap overflow-x-auto p-6">
                             <table className="w-full text-left border-collapse text-sm">
                                 <thead>
-                                    <tr className="border-b border-black/[0.06]">
+                                    <tr className="border-b border-slate-200/60">
                                         <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Table</th>
                                         <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Engine</th>
                                         <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">{driver === 'sqlite' ? 'Rows' : 'Estimated rows'}</th>
@@ -238,7 +238,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                                         <th className="pb-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-black/[0.04]">
+                                <tbody className="divide-y divide-slate-200/40">
                                     {filteredTables.length === 0 ? (
                                         <tr>
                                             <td className="py-8 text-center text-slate-500 text-sm" colSpan={driver === 'sqlite' ? 4 : 5}>No tables match that search.</td>
@@ -266,7 +266,7 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
             </section>
 
             <section className="database-summary grid grid-cols-1 md:grid-cols-3 gap-4" aria-label="Database connection details">
-                <article className="database-info-card p-5 rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+                <article className="database-info-card p-5 rounded-2xl border border-slate-200/60 bg-white shadow-sm">
                     <span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Connection</span>
                     <strong className="text-lg font-bold text-[#1d1d1f] block flex items-center gap-2 mt-1">
                         <span className={connectionDotClass} />
@@ -274,12 +274,12 @@ export default function Database({ driver = 'sqlite', databaseName, serverVersio
                     </strong>
                     <small className="text-xs text-slate-500 mt-1 block">{connected ? `Using the configured ${databaseType} connection.` : `Check the configured ${databaseType} connection.`}</small>
                 </article>
-                <article className="database-info-card p-5 rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+                <article className="database-info-card p-5 rounded-2xl border border-slate-200/60 bg-white shadow-sm">
                     <span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Database</span>
                     <strong className="text-lg font-bold text-[#1d1d1f] block mt-1 truncate">{databaseName}</strong>
                     <small className="text-xs text-slate-500 mt-1 block">{driver === 'sqlite' ? 'Local database file in this project' : 'MySQL schema used by the workbench'}</small>
                 </article>
-                <article className="database-info-card p-5 rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+                <article className="database-info-card p-5 rounded-2xl border border-slate-200/60 bg-white shadow-sm">
                     <span className="database-info-label text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">{driver === 'sqlite' ? 'SQLite version' : 'Server version'}</span>
                     <strong className="text-lg font-bold text-[#1d1d1f] block mt-1">{serverVersion}</strong>
                     <small className="text-xs text-slate-500 mt-1 block">{driver === 'sqlite' ? 'Local database engine' : 'Configured MySQL server'}</small>

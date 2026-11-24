@@ -147,19 +147,15 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
 
     return (
         <div className="workbench-layout min-h-screen bg-[#fbfbfd] text-[#1d1d1f] flex flex-col font-sans selection:bg-black/10 selection:text-black relative overflow-x-hidden">
-            <Head title={title ? `${title} · Jephthah's Workbench` : "Jephthah's Workbench"} />
+            <Head title={title ? `${title} · MyWorkspace` : "MyWorkspace"} />
 
-            <div className="workbench-ambient fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <div className="absolute -top-72 left-1/2 h-[34rem] w-[48rem] -translate-x-1/2 rounded-full bg-black/[0.02] blur-[120px]" />
-            </div>
-
-            <header className="workbench-topbar sticky top-0 z-40 w-full h-16 border-b border-black/[0.08] bg-white/75 backdrop-blur-2xl flex items-center justify-between px-4 lg:px-6 transition-colors">
+            <header className="workbench-topbar sticky top-0 z-40 w-full h-16 border-b border-slate-200/60 bg-white/80 backdrop-blur-2xl flex items-center justify-between px-4 lg:px-6 transition-colors">
                 <div className="flex items-center gap-3 min-w-0">
                     {/* Mobile toggle */}
                     <button
                         type="button"
                         onClick={() => setMobileNavOpen((v) => !v)}
-                        className="lg:hidden p-2 rounded-xl text-slate-500 hover:text-black hover:bg-black/5 transition-colors cursor-pointer"
+                        className="lg:hidden p-2 rounded-xl text-slate-500 hover:text-black hover:bg-slate-100/50 transition-colors cursor-pointer"
                         aria-label="Toggle navigation"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -170,12 +166,19 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                     </button>
 
                     <div className="lg:hidden mr-2">
-                        <span className="font-bold text-xs tracking-tight text-black truncate max-w-[140px]">Jephthah's Workbench</span>
+                        <span className="font-bold text-xs tracking-tight text-black truncate max-w-[140px]">MyWorkspace</span>
                     </div>
 
-                    {/* Page Context & Title */}
-                    <div className="flex flex-col min-w-0">
-                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Admin Console</span>
+                    {/* Page Context & Title - MyWorkspace branding */}
+                    <div className="flex flex-col min-w-0 hidden lg:block">
+                        <span className="text-[10px] font-bold text-slate-500 tracking-widest uppercase">Admin console</span>
+                        <h2 className="text-sm font-bold text-black tracking-tight leading-tight truncate">
+                            MyWorkspace
+                        </h2>
+                    </div>
+
+                    {/* Page Title Only */}
+                    <div className="flex flex-col min-w-0 lg:hidden">
                         <h2 className="text-sm font-bold text-black tracking-tight leading-tight truncate">
                             {title || 'Dashboard'}
                         </h2>
@@ -194,11 +197,11 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                         <button
                             type="button"
                             onClick={() => setProfileOpen((o) => !o)}
-                            className="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1 rounded-full bg-black/[0.04] hover:bg-black/[0.08] border border-black/[0.08] hover:border-black/15 transition-all cursor-pointer shadow-sm group"
+                            className="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1 rounded-full bg-slate-100/60 hover:bg-slate-100 border border-slate-200/60 hover:border-slate-300/60 transition-all cursor-pointer shadow-sm group"
                             aria-expanded={profileOpen}
                             aria-label="User Profile Menu"
                         >
-                            <div className="w-8 h-8 rounded-full overflow-hidden border border-black/10 bg-black/5 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-200/60 bg-slate-100/60 flex items-center justify-center flex-shrink-0">
                                 <span className="text-xs font-bold text-zinc-700">{displayName.slice(0, 1).toUpperCase()}</span>
                             </div>
                             <div className="hidden sm:flex flex-col text-left">
@@ -216,8 +219,8 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
 
                         {/* Profile Dropdown Menu */}
                         <Collapse open={profileOpen}>
-                            <div className="notification-menu is-open profile-settings-menu bg-white border border-black/10 shadow-xl rounded-2xl p-4 absolute right-0 mt-2 w-64 z-50">
-                                <div className="flex items-center gap-3 pb-3 border-b border-black/[0.08]">
+                            <div className="notification-menu is-open profile-settings-menu bg-white border border-slate-200/80 shadow-xl rounded-2xl p-4 absolute right-0 mt-2 w-64 z-50">
+                                <div className="flex items-center gap-3 pb-3 border-b border-slate-200/60">
                                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 p-[1.5px]">
                                         <div className="w-full h-full rounded-full bg-white flex items-center justify-center font-bold text-blue-600">
                                             {displayName.slice(0, 1).toUpperCase()}
@@ -236,7 +239,7 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                                             type="text"
                                             value={profile.data.display_name}
                                             onChange={(e) => profile.setData('display_name', e.target.value)}
-                                            className="w-full h-8 px-2.5 text-xs text-slate-900 bg-white border border-black/[0.1] rounded-lg focus:border-blue-500 outline-none"
+                                            className="w-full h-8 px-2.5 text-xs text-slate-900 bg-white border border-slate-200/80 rounded-lg focus:border-blue-500 outline-none"
                                             required
                                         />
                                     </div>
@@ -246,7 +249,7 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                                             type="email"
                                             value={profile.data.email}
                                             onChange={(e) => profile.setData('email', e.target.value)}
-                                            className="w-full h-8 px-2.5 text-xs text-slate-900 bg-white border border-black/[0.1] rounded-lg focus:border-blue-500 outline-none"
+                                            className="w-full h-8 px-2.5 text-xs text-slate-900 bg-white border border-slate-200/80 rounded-lg focus:border-blue-500 outline-none"
                                             required
                                         />
                                     </div>
@@ -259,7 +262,7 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                                     </button>
                                 </form>
 
-                                <div className="mt-3 pt-3 border-t border-black/[0.08] flex items-center justify-between">
+                                <div className="mt-3 pt-3 border-t border-slate-200/60 flex items-center justify-between">
                                     <Link href={appUrl('/admin/users')} className="text-xs text-slate-500 hover:text-blue-600 transition-colors">
                                         Admin accounts
                                     </Link>
@@ -282,23 +285,12 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                 {/* Left Sidebar */}
                 <aside className={`
                     fixed lg:static top-16 bottom-0 left-0 z-30
-                    w-64 bg-[#f5f5f7]/90 lg:bg-[#f5f5f7]/75 backdrop-blur-2xl
-                    border-r border-black/[0.07] flex flex-col justify-between
+                    w-64 bg-[#f5f5f7]/95 lg:bg-[#f5f5f7]/90 backdrop-blur-2xl
+                    border-r border-slate-200/60 flex flex-col justify-between
                     transition-transform duration-350 cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease
                     ${mobileNavOpen ? 'translate-x-0 opacity-100' : '-translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100'}
                 `}>
-                    <div className="p-5 pb-3">
-                        <Link href={appUrl('/admin')} className="group block min-w-0">
-                            <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="font-extrabold text-sm tracking-tight text-black group-hover:text-blue-600 transition-colors truncate">
-                                        Jephthah's Workbench
-                                    </span>
-                                </div>
-                                <span className="text-[10px] font-medium text-slate-500 tracking-wider uppercase block -mt-0.5">Admin console</span>
-                            </div>
-                        </Link>
-                    </div>
+                    <div className="p-5 pb-3 border-b border-slate-200/60" />
 
                     {/* Navigation Links by Category */}
                     <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-6 scrollbar-thin scrollbar-thumb-black/5">
@@ -316,8 +308,8 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                                             className={`
                                                 group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150
                                                 ${active
-                                                    ? 'bg-white text-blue-600 shadow-sm border border-black/[0.05]'
-                                                    : 'text-slate-600 hover:text-black hover:bg-black/[0.03]'
+                                                    ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
+                                                    : 'text-slate-600 hover:text-black hover:bg-slate-100/60'
                                                 }
                                             `}
                                         >
@@ -335,8 +327,8 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                     </nav>
 
                     {/* Bottom Status Footer */}
-                    <div className="p-3.5 border-t border-black/[0.07] bg-black/[0.01]">
-                        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white border border-black/[0.06] shadow-sm">
+                    <div className="p-3.5 border-t border-slate-200/60 bg-slate-50/50">
+                        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white border border-slate-200/60 shadow-sm">
                             <span className="relative flex h-2 w-2 flex-shrink-0">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -347,7 +339,7 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                             </div>
                         </div>
                         <div className="mt-2.5 text-center text-[10px] text-slate-500">
-                            © {new Date().getFullYear()} Jephthah's Workbench
+                            © {new Date().getFullYear()} MyWorkspace
                         </div>
                     </div>
                 </aside>
@@ -355,7 +347,7 @@ export default function DashboardLayout({ title, activePage = 'overview', childr
                 {/* Mobile backdrop */}
                 {mobileNavOpen && (
                     <div
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-20 lg:hidden transition-opacity duration-300 ease-out animate-fade-in"
+                        className="fixed inset-0 bg-slate-900/10 backdrop-blur-sm z-20 lg:hidden transition-opacity duration-300 ease-out animate-fade-in"
                         onClick={() => setMobileNavOpen(false)}
                     />
                 )}

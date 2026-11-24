@@ -109,6 +109,171 @@
     }
 }
 
+@utility icloud-textarea {
+    background: #ffffff;
+    border: 1px solid var(--color-icloud-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: var(--color-icloud-text);
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.2s ease;
+    &:focus {
+        border-color: var(--color-icloud-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        outline: none;
+    }
+}
+
+@utility icloud-select {
+    background: #ffffff;
+    border: 1px solid var(--color-icloud-border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: var(--color-icloud-text);
+    font-size: 15px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+    &:focus {
+        border-color: var(--color-icloud-blue);
+        box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+        outline: none;
+    }
+}
+
+@utility icloud-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-icloud-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+@utility icloud-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    height: 36px;
+    border-radius: 9999px;
+    background: transparent;
+    color: var(--color-icloud-text);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    &:hover {
+        background: var(--color-icloud-surface-secondary);
+        color: var(--color-icloud-blue);
+    }
+    &:active {
+        transform: scale(0.98);
+    }
+}
+
+@utility field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+@utility form-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-icloud-border);
+}
+
+@utility accomplishment-form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    @media (min-width: 640px) {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@utility accomplishment-stat-chart {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    height: 60px;
+}
+
+@utility accomplishment-stat-chart-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+/* Login Page Specific */
+@utility icloud-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@utility icloud-login-card {
+    @apply icloud-card;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}
+
+@utility icloud-login-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+@utility icloud-brand-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    strong {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--color-icloud-text);
+    }
+    small {
+        font-size: 0.75rem;
+        color: var(--color-icloud-text-tertiary);
+        font-weight: 500;
+    }
+}
+
+@utility login-input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+@utility login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* FilePicker overrides already in base CSS */
+
+/* Notification menu overrides already in base CSS */
+
+/* Collapsible overrides already in base CSS */
+
 /* Global Overrides for Rebranding */
 .workbench-layout {
     background: var(--color-icloud-bg);
@@ -162,7 +327,7 @@
     pointer-events: auto;
 }
 .notification-trigger { cursor: pointer; padding: 8px; border-radius: 50%; color: #1d1d1f; }
-.notification-trigger:hover { background: rgba(0,0,0,0.05); }
+.notification-trigger:hover { background: var(--color-icloud-border); }
 .notification-trigger svg { width: 20px; height: 20px; }
 .notification-menu-heading { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
 .notification-menu-heading strong { font-size: 13px; }
@@ -188,31 +353,29 @@
     transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.05s;
 }
 
-/* Interactive lift for cards and stat tiles */
+/* Interactive lift for cards and stat tiles - reduced motion */
 .icloud-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .icloud-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-}
-.icloud-card:active {
-    transform: translateY(0);
-    transition-duration: 0.1s;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    border-color: var(--color-icloud-border-hover);
 }
 
-/* Pressed feedback on every button */
-button,
-a[role="button"],
-[type="button"],
-[type="submit"],
-[type="reset"] {
+/* Pressed feedback on buttons without utility classes */
+button:not([class*="icloud-btn"]),
+a[role="button"]:not([class*="icloud-btn"]),
+[type="button"]:not([class*="icloud-btn"]),
+[type="submit"]:not([class*="icloud-btn"]),
+[type="reset"]:not([class*="icloud-btn"]) {
     transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
 }
-button:active,
-[type="button"]:active,
-[type="submit"]:active {
-    transform: scale(0.97);
+button:not([class*="icloud-btn"]):active,
+a[role="button"]:not([class*="icloud-btn"]):active,
+[type="button"]:not([class*="icloud-btn"]):active,
+[type="submit"]:not([class*="icloud-btn"]):active,
+[type="reset"]:not([class*="icloud-btn"]):active {
+    transform: scale(0.98);
 }
 
 /* Table rows: subtle fade-in + lift on hover */
@@ -220,7 +383,7 @@ table tbody tr {
     transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
 table tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.025);
+    background-color: var(--color-icloud-border);
 }
 
 /* Staggered entrance for task lists and tool grids */

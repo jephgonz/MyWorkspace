@@ -28,7 +28,7 @@ export default function Users({ users = [] }) {
                 </div>
 
                 <section className="icloud-card overflow-hidden">
-                    <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
+                    <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New administrator</p>
                             <h2 className="text-xl font-bold text-[#1d1d1f] mt-1">Create admin account</h2>
@@ -58,7 +58,7 @@ export default function Users({ users = [] }) {
                                     <p className="text-[10px] text-slate-400 ml-1">At least 12 characters.</p>
                                     {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
                                 </div>
-                                <div className="pt-4 border-t border-black/[0.06] flex items-center gap-3">
+                                <div className="pt-4 border-t border-slate-200/60 flex items-center gap-3">
                                     <button className="icloud-btn h-9 px-6 shadow-md" type="submit" disabled={form.processing}>Create account</button>
                                     <button className="icloud-btn-secondary h-9 px-6" type="button" onClick={() => setShowForm(false)}>Cancel</button>
                                 </div>
@@ -68,7 +68,7 @@ export default function Users({ users = [] }) {
                 </section>
 
                 <section className="icloud-card overflow-hidden">
-                    <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
+                    <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
                         <div>
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Account directory</p>
                             <h2 className="text-xl font-bold text-[#1d1d1f] mt-1">Active Users</h2>
@@ -93,7 +93,7 @@ export default function Users({ users = [] }) {
                                         <th className="px-6 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-black/[0.04]">
+                                <tbody className="divide-y divide-slate-200/40">
                                     {users.map((user) => (
                                         <tr key={user.id} className="hover:bg-slate-50/80 transition-colors group">
                                             <td className="px-6 py-4">

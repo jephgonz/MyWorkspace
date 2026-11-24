@@ -12,7 +12,7 @@ export default function Login() {
             <main className="icloud-page min-h-screen flex items-center justify-center px-4">
                 <div className="icloud-card icloud-login-card w-full max-w-md p-6">
                     <div className="icloud-login-brand mb-7">
-                        <span className="icloud-brand-copy"><strong>Jephthah's Workbench</strong><small>Administrator access</small></span>
+                        <span className="icloud-brand-copy"><strong>MyWorkspace</strong><small>Administrator access</small></span>
                     </div>
                     <h1 className="text-[1.5rem] font-bold text-icloud-text mb-1">Sign in</h1>
                     <p className="text-[0.85rem] text-icloud-text-secondary mb-6">Use your administrator email and password.</p>
@@ -37,7 +37,7 @@ export default function Login() {
                         {form.errors.form && <p className="text-[0.75rem] text-icloud-danger">{form.errors.form}</p>}
                         <button className="icloud-btn w-full" type="submit" disabled={form.processing}>{form.processing ? 'Signing in…' : 'Sign in'}</button>
                     </form>
-                    <footer className="mt-6 pt-4 border-t border-icloud-border flex justify-between text-[0.7rem] text-icloud-text-tertiary"><span>© {new Date().getFullYear()} Jephthah's Workbench</span><span>Administrator access only</span></footer>
+                    <footer className="mt-6 pt-4 border-t border-icloud-border flex justify-between text-[0.7rem] text-icloud-text-tertiary"><span>© {new Date().getFullYear()} MyWorkspace</span><span>Administrator access only</span></footer>
                 </div>
             </main>
         </>

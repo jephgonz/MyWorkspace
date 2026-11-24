@@ -19,7 +19,7 @@ export default function IdGenerator() {
             {errors.form && <div className="p-4 border border-rose-200 bg-rose-50 rounded-xl text-xs text-rose-700" role="alert">{errors.form}</div>}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <section className="icloud-card overflow-hidden">
-                    <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
+                    <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
                         <div>
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Step 01</span>
                             <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Employee details</h2>
@@ -34,11 +34,11 @@ export default function IdGenerator() {
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Nickname</label>
-                            <input className="icloud-input" value={form.data.nickname} onChange={(event) => form.setData('nickname', event.target.value)} required placeholder="e.g. Jeph" />
+                            <input className="icloud-input" value={form.data.nickname} onChange={(event) => form.setData('nickname', event.target.value)} required placeholder="e.g. Alex" />
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Full name</label>
-                            <input className="icloud-input" value={form.data.fullname} onChange={(event) => form.setData('fullname', event.target.value)} required placeholder="e.g. Jephthah Gonzalez" />
+                            <input className="icloud-input" value={form.data.fullname} onChange={(event) => form.setData('fullname', event.target.value)} required placeholder="e.g. Alexthah Chen" />
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider ml-1">Position</label>
@@ -63,15 +63,15 @@ export default function IdGenerator() {
                 </section>
                 <section className="icloud-card overflow-hidden flex flex-col justify-between">
                     <div className="flex-1 flex flex-col">
-                        <div className="p-6 border-b border-black/[0.06]">
+                        <div className="p-6 border-b border-slate-200/60">
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Step 02</span>
                             <h2 className="text-xl font-bold text-[#1d1d1f] mt-0.5">Card preview</h2>
                         </div>
                         <div className="p-6 flex-1 flex items-center justify-center bg-slate-50/50 min-h-[520px]">
-                            <img src={card ? appUrl(`/admin/tools/id-generator/preview/${encodeURIComponent(card)}`) : appUrl('/public/tools/sp-id-generator/id.png')} alt={card ? 'Generated employee ID card' : 'Sample employee ID card template'} className="w-full h-full object-contain max-h-[600px] rounded-2xl border border-black/[0.1] shadow-2xl bg-white p-2" />
+                            <img src={card ? appUrl(`/admin/tools/id-generator/preview/${encodeURIComponent(card)}`) : appUrl('/public/tools/sp-id-generator/id.png')} alt={card ? 'Generated employee ID card' : 'Sample employee ID card template'} className="w-full h-full object-contain max-h-[600px] rounded-2xl border border-slate-200/80 shadow-2xl bg-white p-2" />
                         </div>
                     </div>
-                    <div className="p-6 border-t border-black/[0.06] flex justify-end bg-white">
+                    <div className="p-6 border-t border-slate-200/60 flex justify-end bg-white">
                         {card ? <a className="icloud-btn h-10 px-6 shadow-md" href={appUrl(`/admin/tools/id-generator/download/${encodeURIComponent(card)}`)}>↓ Download ID card</a> : <p className="text-xs text-slate-400 font-medium">Your generated card will appear here.</p>}
                     </div>
                 </section>

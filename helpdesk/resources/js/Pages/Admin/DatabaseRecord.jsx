@@ -23,7 +23,7 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
     return (
         <DashboardLayout title={mode === 'create' ? 'Add database row' : 'Edit database row'} activePage="database">
             <section className="space-y-6">
-                <div className="pb-4 border-b border-black/[0.06]">
+                <div className="pb-4 border-b border-slate-200/60">
                     <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">{table}</p>
                     <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">{mode === 'create' ? 'Add row' : 'Edit row'}</h1>
                     <p className="text-sm text-slate-500 mt-1">Update fields in the selected table.</p>
@@ -59,7 +59,7 @@ export default function DatabaseRecord({ table, mode, fields = [], record = {}, 
                         })}
                         {form.errors.form && <p className="text-xs text-rose-600 font-medium" role="alert">{form.errors.form}</p>}
 
-                        <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-black/[0.06]">
+                        <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-slate-200/60">
                             <button className="icloud-btn w-full shadow-md" type="submit" disabled={form.processing}>{form.processing ? 'Saving…' : 'Save row'}</button>
                             <Link className="icloud-btn-secondary w-full" href={`${appUrl('/admin/database/table')}?table=${encodeURIComponent(table)}`}>Cancel</Link>
                         </div>

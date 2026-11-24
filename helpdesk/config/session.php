@@ -127,7 +127,7 @@ return [
     |
     */
 
-    'cookie' => env('SESSION_COOKIE', 'jephthahs_workbench'),
+    'cookie' => env('SESSION_COOKIE', 'myworkspace'),
 
     /*
     |--------------------------------------------------------------------------

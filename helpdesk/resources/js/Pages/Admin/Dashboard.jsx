@@ -113,11 +113,11 @@ export default function Dashboard({
         <DashboardLayout title="Dashboard" activePage="overview">
             <div className="space-y-6">
                 {/* Dashboard Page Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/[0.06]">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/60">
                     <div>
                         <div className="flex items-center gap-2 mb-1.5">
                             <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(0,113,227,0.3)]" />
-                            <span className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Jephthah's Workbench</span>
+                            <span className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">MyWorkspace</span>
                         </div>
                         <h1 className="text-3xl font-extrabold tracking-tight text-[#1d1d1f]">Dashboard</h1>
                         <p className="text-sm text-slate-500 mt-1">
@@ -223,7 +223,7 @@ export default function Dashboard({
                 {/* Section: Pending Tasks Preview */}
                 {pendingTasks && pendingTasks.length > 0 && (
                     <div className="icloud-card p-6">
-                        <div className="flex items-center justify-between pb-4 border-b border-black/[0.06]">
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-200/60">
                             <div className="flex items-center gap-3">
                                 <span className="text-blue-600">
                                     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -238,7 +238,7 @@ export default function Dashboard({
                             </Link>
                         </div>
 
-                        <div className="mt-2 divide-y divide-black/[0.04]">
+                        <div className="mt-2 divide-y divide-slate-200/40">
                             {pendingTasks.map((task) => (
                                 <div key={task.id} className="py-4 flex items-center justify-between gap-4">
                                     <div className="min-w-0">
@@ -259,7 +259,7 @@ export default function Dashboard({
 
                 {/* Section: Application Tools */}
                 <div className="icloud-card p-8">
-                    <div className="pb-6 border-b border-black/[0.06]">
+                    <div className="pb-6 border-b border-slate-200/60">
                         <h2 className="text-base font-bold text-[#1d1d1f] uppercase tracking-wider">Application Tools</h2>
                         <p className="text-sm text-slate-500 mt-1">Quick access to all workbench modules and administrative utilities.</p>
                     </div>
@@ -269,7 +269,7 @@ export default function Dashboard({
                             <Link
                                 key={app.key}
                                 href={appUrl(app.href)}
-                                className={`group p-5 rounded-2xl bg-white hover:bg-slate-50 border border-black/[0.06] ${app.borderColor} ${app.shadowColor} transition-all duration-300 flex flex-col justify-between shadow-sm`}
+                                className={`group p-5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/60 ${app.borderColor} ${app.shadowColor} transition-all duration-300 flex flex-col justify-between shadow-sm`}
                             >
                                 <div className="flex items-start gap-4">
                                     <div
@@ -293,7 +293,7 @@ export default function Dashboard({
                                     </div>
                                 </div>
 
-                                <div className="mt-5 pt-4 border-t border-black/[0.04] flex items-center justify-end text-[11px] font-bold text-slate-400 group-hover:text-blue-600 transition-colors uppercase tracking-widest">
+                                <div className="mt-5 pt-4 border-t border-slate-200/40 flex items-center justify-end text-[11px] font-bold text-slate-400 group-hover:text-blue-600 transition-colors uppercase tracking-widest">
                                     <span>Launch</span>
                                     <span className="ml-1.5 group-hover:translate-x-1 transition-transform">→</span>
                                 </div>

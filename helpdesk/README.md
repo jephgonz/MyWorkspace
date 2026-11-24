@@ -1,49 +1,259 @@
-# Jephthah's Workbench
+# MyWorkspace
 
-Jephthah's Workbench uses Laravel 12 with Inertia.js and React. Sign in at `/` to access the administrator workspace, which includes task management, administrator accounts, database tools, the SP ID Generator, and monthly CSV allocation. The app uses a local SQLite database at `database/database.sqlite`; this file is gitignored and must be kept private. Existing records were copied from the previously configured MySQL database without changing the source database.
+MyWorkspace is a Laravel 12 + Inertia.js + React 19 admin application. Sign in at `/` to access the administrator workspace featuring task management, administrator accounts, database tools, the SP ID Generator, and monthly CSV allocation.
 
-## Local setup
+**Tech Stack:** PHP 8.2+, Laravel 12, SQLite (primary), Inertia.js, React 19, TailwindCSS 4, Vite 7
 
-1. Copy `.env.example` to `.env` only when there is no existing environment file. Preserve the current `.env` and database settings when upgrading.
-2. The default configuration uses the project-local SQLite database. For a new installation, create the database file before running migrations:
+---
 
-   ```powershell
-   if (!(Test-Path database\database.sqlite)) {
-       New-Item -ItemType File -Path database\database.sqlite | Out-Null
-   }
-   ```
+## Current Database Schema
 
-   Keep `DB_CONNECTION=sqlite` so local SQLite remains the application's primary database. For the current XAMPP URL, use `APP_URL=http://localhost/helpdesk` and `ASSET_URL=/helpdesk/public`. Configure the Aiven MySQL connection variables (`MYSQL_DATABASE`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, and `DB_SSL_CA`) for the database-panel backup and restore actions.
-3. Install dependencies and build the React UI:
+After all migrations, these tables remain active:
 
-   ```powershell
-   composer install
-   npm install
-   npm run build
-   ```
+| Table | Purpose |
+|-------|---------|
+| `helpdesk_users` | Administrator accounts (username, email, password_hash, role: admin/staff, is_active) |
+| `helpdesk_accomplishments` | Tasks with title, description, due_date, status (todo/done), completed_at, created_by |
+| `helpdesk_notification_settings` | Per-admin browser notification preferences (task_due, etc.) |
+| `helpdesk_settings` | Key-value settings (monthly CSV targets, base amounts, SP ID generator config) |
+| `migrations` | Laravel migration history |
 
-4. When upgrading an existing installation, run `php bin/migrate.php` once to complete the username and role schema updates. It is idempotent and preserves existing administrator rows. Back up the database before applying Laravel migrations. Generate an application key once if `APP_KEY` is empty, then run:
+**Removed (irreversible):** tickets, notices, chat tables, task_board, cache/cache_locks
 
-   ```powershell
-   php artisan key:generate
-   php artisan migrate --force
-   ```
+---
 
-   Do not run `migrate:fresh` or `db:wipe`; those commands remove application data.
-5. For a new installation only, set `INITIAL_ADMIN_NAME`, `INITIAL_ADMIN_EMAIL`, and a 12-character-or-longer `INITIAL_ADMIN_PASSWORD`, then run `php bin/setup.php`. The one-time credentials are removed from `.env` after setup.
+## Features
 
-The root URL is the workbench sign-in page; successful sign-in opens the administrator dashboard. Email addresses are not unique. The workbench includes task reminders, administrator account management, database tables and SQL import/export, the SP ID Generator, and monthly CSV allocation.
+### Administrator Dashboard (`/admin`)
+Overview of tasks, quick actions, and notification status.
 
-Migration `2026_11_04_000000_remove_tickets_and_notices` permanently deletes the support-ticket and notice tables, their stored notice attachments, and the support-request notification preference. It preserves administrator accounts, tasks, settings, and other tables. This migration cannot be rolled back, and deleted data cannot be recovered; make a backup before applying it.
+### Task Management (`/admin/accomplishments`)
+- Create, update, complete, delete tasks
+- Due dates with browser notification reminders
+- Status: `todo` → `done` (with `completed_at` timestamp)
+- Indexed by owner + status + created_at for performance
 
-Only administrator accounts are supported. Migration `2026_10_20_000000_remove_chat_and_disable_staff_accounts` disables existing staff accounts but preserves their records; they cannot be reactivated or promoted through the application. That migration also permanently deletes chat conversations, messages, and related chat tables, and cannot be rolled back. Deleted chat history cannot be recovered.
+### Administrator Accounts (`/admin/users`)
+- Create new admins (name, email, password, role: admin/staff)
+- Toggle active/inactive status
+- **Usernames** are unique; emails are **not** unique (allows shared inboxes)
+- Staff accounts exist but cannot be promoted via UI
 
-Migration `2026_10_20_000001_remove_task_board_feature` permanently removes the task board and deletes all stored task records. It cannot be rolled back.
+### Database Tools (`/admin/database`)
+- **Table browser** with pagination, search, column visibility
+- **SQL query runner** (read-only SELECT by default; write requires confirmation)
+- **Export** entire SQLite database as `.sqlite` file
+- **Import** `.sqlite` file (replaces local DB; stops app first)
+- **Backup to Aiven MySQL** — preview → confirm → snapshots destination → clones managed tables
+- **Restore from Aiven** — preview → confirm → snapshots local → replaces managed tables
+- **Row-level CRUD** (create/edit/delete records in any table)
+- **Metrics** — row counts, table sizes, Aiven sync status
+- Managed tables: users, settings, notification_settings, accomplishments, migrations
+- 20,000 row cap per table per database
+- Private snapshots in `storage/app/private/database-backups/`
 
-Laravel uses the file cache by default, including for request throttling. The database cache and lock tables are not needed. If `.env` explicitly sets `CACHE_STORE=database`, change it to `CACHE_STORE=file` before migrating. Migration `2026_10_20_000002_remove_database_cache_tables` permanently drops `cache` and `cache_locks`; existing cached values are discarded.
+### SP ID Generator (`/admin/tools/id-generator`)
+- React page: `resources/js/Pages/Admin/IdGenerator.jsx`
+- GD composition: `app/Services/IdCardGenerator.php`
+- Templates & fonts: `public/tools/sp-id-generator/img/`
+- Requires PHP GD + FreeType
+- Old `/tools/sp-id-generator/` redirects here
 
-Local SQLite is the application's primary database; Aiven MySQL is used as a backup copy, not for normal app traffic. In the database panel, **Back up local to Aiven** replaces Aiven's managed table data with local data, and **Restore Aiven to local** replaces local managed data with Aiven's copy. Both operations require reviewing a preview and confirming; the destination is snapshotted first. The panel compares the copies and indicates whether Aiven is current, outdated, or needs attention. Cloning covers users, settings, notification settings, accomplishments, and Laravel migration history; both databases must have matching schemas, and MySQL tables must use InnoDB. Each managed table is capped at 20,000 rows per database. Private pre-clone snapshots are stored under `storage/app/private/database-backups`; snapshots and database exports may contain password hashes and other sensitive data, so keep them private. The database tools also export the local SQLite database as a `.sqlite` file. Restore a standalone SQLite export by stopping the app and replacing `database/database.sqlite`.
+### Monthly CSV Allocation (`/admin/tools/monthly-allocation`)
+- Generates one row per weekday in selected month
+- Columns: `number,datetime,value,refnumber,ads`
+- Datetime format: `MMM dd, yyyy h:mm AM` (no leading apostrophe)
+- Configurable monthly target (whole pesos) + base weekday amount
+- Remaining total assigned to final two weekdays (month-end rule)
+- Base auto-reduced if target too low; total always matches target
+- Random times (8:00–11:59 AM), refs (100M–199,999,999), random PNG from `MONTHLY_PLAN_AD_DIRECTORY`
+- Settings persisted in `helpdesk_settings` table
+- Throttled: 3 downloads/minute
 
-The SP ID Generator is part of the Laravel admin application. Its React page is in `resources/js/Pages/Admin/IdGenerator.jsx`, and its GD-based card composition is in `app/Services/IdCardGenerator.php`. The card template and required fonts remain under `public/tools/sp-id-generator/img`; PHP GD with FreeType support must be enabled to generate cards. The old `/tools/sp-id-generator/` URL redirects to the admin page.
+### Browser Notifications
+- Per-admin settings at `/admin/notifications/settings`
+- Task due reminders (enabled by default)
+- Polling endpoint at `/admin/notifications`
 
-The Monthly CSV tool downloads one CSV row per weekday in the selected month, matching the `number,datetime,value,refnumber,ads` columns in the supplied example. Datetimes use the formatted `MMM dd, yyyy h:mm AM` text without a leading apostrophe. The admin can set a positive whole-peso monthly target and base weekday amount; both are saved when downloading and restored on later visits. Weekday allocations use the selected base amount, with the remaining total assigned to the final two weekdays using the month-end rule. If the selected target is too low to sustain the base, the base is reduced as needed. The total always matches the target. The generator uses the configured number, random weekday times from 8:00–11:59 AM, random references from 100,000,000 to 199,999,999, and randomly selected PNG paths from `MONTHLY_PLAN_AD_DIRECTORY`. Set `MONTHLY_PLAN_NUMBER` and `MONTHLY_PLAN_AD_DIRECTORY` in `.env` to customize the number and local ad directory. Migration `2026_10_20_000003_create_helpdesk_settings_table` stores the remembered settings. PSD files, Photoshop, and image generation are not used.
+---
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `APP_NAME` | Application name | `"MyWorkspace"` |
+| `APP_ENV` | Environment | `local` |
+| `APP_KEY` | Laravel app key (generate once) | — |
+| `APP_DEBUG` | Debug mode | `true` |
+| `APP_URL` | Public URL | `http://localhost/helpdesk` |
+| `ASSET_URL` | Asset base path | `/helpdesk/public` |
+| `APP_TIMEZONE` | Timezone | `Asia/Manila` |
+| `DB_CONNECTION` | Primary DB driver | `sqlite` |
+| `DB_DATABASE` | SQLite path | `database/database.sqlite` |
+| `MYSQL_DATABASE` | Aiven MySQL database name | — |
+| `DB_HOST` | Aiven host | — |
+| `DB_PORT` | Aiven port | `3306` |
+| `DB_USERNAME` | Aiven username | — |
+| `DB_PASSWORD` | Aiven password | — |
+| `DB_SSL_CA` | Aiven CA cert path | `config/certs/ca.pem` |
+| `SESSION_DRIVER` | Session driver | `file` |
+| `SESSION_COOKIE` | Cookie name | `myworkspace` |
+| `INITIAL_ADMIN_NAME` | First admin name (setup only) | — |
+| `INITIAL_ADMIN_EMAIL` | First admin email (setup only) | — |
+| `INITIAL_ADMIN_PASSWORD` | First admin password, 12+ chars (setup only) | — |
+| `MONTHLY_PLAN_NUMBER` | CSV `number` column value | — |
+| `MONTHLY_PLAN_AD_DIRECTORY` | Local path to ad PNGs for CSV | — |
+
+---
+
+## Local Setup
+
+### New Installation
+
+```powershell
+# 1. Create SQLite file
+if (!(Test-Path database\database.sqlite)) {
+    New-Item -ItemType File -Path database\database.sqlite | Out-Null
+}
+
+# 2. Install & build
+composer install
+npm install
+npm run build
+
+# 3. Generate key & migrate
+php artisan key:generate
+php artisan migrate --force
+
+# 4. Create first admin (one-time)
+# Set INITIAL_ADMIN_NAME, INITIAL_ADMIN_EMAIL, INITIAL_ADMIN_PASSWORD in .env first
+php bin/setup.php
+# Credentials are removed from .env after setup
+```
+
+### Existing Installation (Upgrade)
+
+```powershell
+# Preserve existing .env and database/database.sqlite
+composer install
+npm install
+npm run build
+
+# Run username/role migration (idempotent)
+php bin/migrate.php
+
+# Standard migrations
+php artisan migrate --force
+
+# ⚠️ Never run migrate:fresh or db:wipe — they destroy data
+```
+
+### Development
+
+```bash
+# All services (server, queue, logs, Vite)
+composer dev
+
+# Or individually:
+php artisan serve
+php artisan queue:listen --tries=1 --timeout=0
+php artisan pail --timeout=0
+npm run dev
+```
+
+### Testing
+
+```bash
+composer test
+# or
+php artisan test
+```
+
+---
+
+## Key Implementation Details
+
+### Routing
+All admin routes under `/admin` prefix with `admin` middleware (`EnsureAdmin`).
+- Root `/` and `/admin/login` → AuthController::show
+- POST `/admin/login` → AuthController::login (throttled 5/min)
+- POST `/logout` → AuthController::logout
+
+### Middleware
+- `admin` — ensures authenticated admin user
+- `throttle:5,1` — login attempts
+- `throttle:3,1` — CSV downloads
+
+### Controllers
+| Controller | Routes |
+|------------|--------|
+| `AuthController` | login, logout |
+| `DashboardController` | admin dashboard |
+| `AccomplishmentController` | CRUD tasks |
+| `UserController` | CRUD admins, toggle status |
+| `DatabaseController` | full DB toolkit |
+| `IdGeneratorController` | ID cards (generate, preview, download) |
+| `MonthlyAllocationController` | CSV download |
+| `BrowserNotificationController` | poll, settings |
+| `ProfileController` | update own profile |
+
+### Services
+- `DatabaseSyncService` — Aiven ↔ SQLite clone logic, preview, snapshots
+- `IdCardGenerator` — GD-based card composition
+
+### Frontend
+- Entry: `resources/js/app.jsx`
+- Pages: `resources/js/Pages/Admin/*.jsx`
+- Components: `resources/js/Components/`
+- CSS: `resources/css/app.css` (TailwindCSS 4 via Vite plugin)
+- Build: `npm run build` → `public/build/`
+
+---
+
+## Important Notes
+
+1. **SQLite is primary** — Aiven MySQL is backup only, not for app traffic
+2. **Email not unique** — Multiple admins can share an email address
+3. **Usernames are unique** — Generated for staff during `bin/migrate.php`
+4. **Destructive migrations** — Several migrations permanently delete tables; they **cannot be rolled back**
+5. **Cache uses file driver** — `CACHE_STORE=file` (not database)
+6. **Private data** — Snapshots, exports, `.sqlite` files contain password hashes; keep secure
+7. **PHP GD + FreeType required** — For SP ID Generator cards
+
+---
+
+## File Structure Highlights
+
+```
+helpdesk/
+├── app/
+│   ├── Http/Controllers/       # All controllers
+│   ├── Http/Middleware/        # EnsureAdmin, HandleInertiaRequests
+│   ├── Models/User.php         # Admin model (name, email, password)
+│   ├── Services/
+│   │   ├── DatabaseSyncService.php
+│   │   └── IdCardGenerator.php
+│   └── Providers/AppServiceProvider.php
+├── bin/
+│   ├── migrate.php             # Username/role schema migration (MySQL-aware)
+│   └── setup.php               # First admin creation
+├── config/                     # Laravel config
+├── database/
+│   ├── migrations/             # All migrations (including removed features)
+│   ├── database.sqlite         # Gitignored primary DB
+│   └── factories/seeders/
+├── public/
+│   ├── tools/sp-id-generator/img/  # ID card templates & fonts
+│   └── build/                  # Vite output (gitignored)
+├── resources/
+│   ├── js/Pages/Admin/         # Inertia React pages
+│   ├── js/Components/          # Shared React components
+│   └── css/app.css             # Tailwind entry
+├── routes/web.php              # All routes
+├── storage/app/private/database-backups/  # Private snapshots (gitignored)
+├── .env                        # Gitignored
+├── composer.json
+├── package.json
+├── vite.config.js
+└── artisan
+```

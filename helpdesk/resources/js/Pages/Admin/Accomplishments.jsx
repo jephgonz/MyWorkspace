@@ -7,6 +7,177 @@ import { appUrl } from '../../url';
 
 const statusLabels = { todo: 'To do', completed: 'Completed' };
 
+function CalendarView({ tasks, currentDate, onDateClick }) {
+    const monthStart = useMemo(() => new Date(currentDate.getFullYear(), currentDate.getMonth(), 1), [currentDate]);
+    const monthEnd = useMemo(() => new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0), [currentDate]);
+    const startDay = monthStart.getDay();
+    const daysInMonth = monthEnd.getDate();
+    const todayKey = dateKey(new Date());
+
+    const tasksByDate = useMemo(() => {
+        const map = {};
+        tasks.forEach((task) => {
+            if (task.due_date) {
+                const key = task.due_date.slice(0, 10);
+                if (!map[key]) map[key] = [];
+                map[key].push(task);
+            }
+        });
+        return map;
+    }, [tasks]);
+
+    const prevMonth = () => onDateClick(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+    const nextMonth = () => onDateClick(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+
+    const weeks = useMemo(() => {
+        const result = [];
+        let week = [];
+        for (let i = 0; i < startDay; i++) week.push(null);
+        for (let day = 1; day <= daysInMonth; day++) {
+            week.push(day);
+            if (week.length === 7) {
+                result.push(week);
+                week = [];
+            }
+        }
+        if (week.length > 0) {
+            while (week.length < 7) week.push(null);
+            result.push(week);
+        }
+        return result;
+    }, [startDay, daysInMonth]);
+
+    return (
+        <div className="icloud-card p-0 overflow-hidden">
+            <div className="p-4 border-b border-slate-200/60 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-black hover:bg-slate-100/60 transition-colors" onClick={prevMonth} aria-label="Previous month">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <h2 className="text-lg font-bold text-[#1d1d1f]">
+                        {currentDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+                    </h2>
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-black hover:bg-slate-100/60 transition-colors" onClick={nextMonth} aria-label="Next month">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+                <button
+                    className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    onClick={() => onDateClick(new Date())}
+                    aria-label="Go to today"
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                </button>
+            </div>
+            <div className="p-4 bg-slate-50/50 border-b border-slate-200/60">
+                <div className="grid grid-cols-7 gap-0.5">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+                        <div key={i} className="text-center text-[10px] font-bold text-slate-400 uppercase tracking-wider py-1.5">
+                            {day}
+                        </div>
+                    ))}
+                </div>
+            </div>
+            <div className="p-3">
+                <div className="grid grid-cols-7 gap-0.5">
+                    {weeks.map((week, weekIndex) =>
+                        week.map((day, dayIndex) => {
+                            if (day === null) {
+                                return <div key={`${weekIndex}-${dayIndex}`} className="aspect-square" />;
+                            }
+                            const dateKeyStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const dayTasks = tasksByDate[dateKeyStr] || [];
+                            const isToday = dateKeyStr === todayKey;
+                            const isPast = !isToday && new Date(dateKeyStr) < new Date(todayKey);
+                            return (
+                                <button
+                                    key={`${weekIndex}-${dayIndex}`}
+                                    type="button"
+                                    className={`relative aspect-square rounded-xl p-2 text-left transition-all ${
+                                        isToday
+                                            ? 'bg-blue-50 border-2 border-blue-500'
+                                            : isPast
+                                            ? 'bg-slate-50/80 text-slate-400'
+                                            : 'bg-white hover:bg-slate-50 border border-slate-200/60'
+                                    }`}
+                                    onClick={() => onDateClick(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
+                                    disabled={dayTasks.length === 0 && !isToday}
+                                    style={{ opacity: dayTasks.length === 0 && !isToday ? 0.6 : 1 }}
+                                >
+                                    <span className={`text-sm font-medium ${isToday ? 'text-blue-600' : isPast ? 'text-slate-400' : 'text-[#1d1d1f]'}`}>
+                                        {day}
+                                    </span>
+                                    {dayTasks.length > 0 && (
+                                        <div className="mt-1.5 space-y-1 max-h-[100px] overflow-y-auto">
+                                            {dayTasks.slice(0, 3).map((task) => (
+                                                <div
+                                                    key={task.id}
+                                                    className={`text-[10px] px-1.5 py-0.5 rounded truncate ${
+                                                        task.status === 'completed'
+                                                            ? 'bg-emerald-50 text-emerald-700'
+                                                            : 'bg-blue-50 text-blue-700'
+                                                    }`}
+                                                    title={task.title}
+                                                >
+                                                    {task.status === 'completed' ? '✓ ' : ''}{task.title}
+                                                </div>
+                                            ))}
+                                            {dayTasks.length > 3 && (
+                                                <div className="text-[10px] text-slate-500 text-center">+{dayTasks.length - 3} more</div>
+                                            )}
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function formatDate(value) {
+    if (!value) return '';
+    const datePart = value.slice(0, 10);
+    const [year, month, day] = datePart.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function formatDueDate(value) {
+    if (!value) return '';
+    const datePart = value.slice(0, 10);
+    const [year, month, day] = datePart.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function dateKey(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function startOfWeek(date) {
+    const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+    return start;
+}
+
+function CompletionChart({ items, label }) {
+    const maxCount = Math.max(...items.map((item) => item.count), 1);
+    const chartDescription = items.map((item) => `${item.label}: ${item.count}`).join(', ');
+
+    return (
+        <div className="accomplishment-stat-chart" role="img" aria-label={`${label}. ${chartDescription}`}>
+            {items.map((item) => (
+                <div className="accomplishment-stat-chart-item" key={item.label} title={`${item.label}: ${item.count}`}>
+                    <small className="text-[0.7rem] text-icloud-text-tertiary">{item.count}</small>
+                    <div className="accomplishment-stat-chart-track"><span style={{ height: `${Math.max((item.count / maxCount) * 100, 4)}%` }} /></div>
+                    <span className="text-[0.7rem] text-icloud-text-secondary">{item.label}</span>
+                </div>
+            ))}
+        </div>
+    );
+}
+
 function AccomplishmentForm({ task, onCancel, onSaved }) {
     const form = useForm({
         title: task?.title || '',
@@ -55,47 +226,6 @@ function AccomplishmentForm({ task, onCancel, onSaved }) {
     );
 }
 
-function formatDate(value) {
-    if (!value) return '';
-    const datePart = value.slice(0, 10);
-    const [year, month, day] = datePart.split('-').map(Number);
-    return new Date(year, month - 1, day).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function formatDueDate(value) {
-    if (!value) return '';
-    const datePart = value.slice(0, 10);
-    const [year, month, day] = datePart.split('-').map(Number);
-    return new Date(year, month - 1, day).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function dateKey(date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-}
-
-function startOfWeek(date) {
-    const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
-    return start;
-}
-
-function CompletionChart({ items, label }) {
-    const maxCount = Math.max(...items.map((item) => item.count), 1);
-    const chartDescription = items.map((item) => `${item.label}: ${item.count}`).join(', ');
-
-    return (
-        <div className="accomplishment-stat-chart" role="img" aria-label={`${label}. ${chartDescription}`}>
-            {items.map((item) => (
-                <div className="accomplishment-stat-chart-item" key={item.label} title={`${item.label}: ${item.count}`}>
-                    <small className="text-[0.7rem] text-icloud-text-tertiary">{item.count}</small>
-                    <div className="accomplishment-stat-chart-track"><span style={{ height: `${Math.max((item.count / maxCount) * 100, 4)}%` }} /></div>
-                    <span className="text-[0.7rem] text-icloud-text-secondary">{item.label}</span>
-                </div>
-            ))}
-        </div>
-    );
-}
-
 export default function Accomplishments({ accomplishments = [] }) {
     const currentDate = useMemo(() => new Date(), []);
     const currentWeekStart = useMemo(() => startOfWeek(currentDate), [currentDate]);
@@ -108,6 +238,8 @@ export default function Accomplishments({ accomplishments = [] }) {
     const [showForm, setShowForm] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [pendingAction, setPendingAction] = useState(null);
+    const [viewMode, setViewMode] = useState('list');
+    const [calendarDate, setCalendarDate] = useState(new Date());
     const periodStats = useMemo(() => {
         const startOfWeek = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
         startOfWeek.setDate(startOfWeek.getDate() - ((startOfWeek.getDay() + 6) % 7));
@@ -239,13 +371,41 @@ export default function Accomplishments({ accomplishments = [] }) {
     return (
         <DashboardLayout title="Accomplishments" activePage="accomplishments">
             <section className="space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
                         <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Personal Work Tracker</p>
                         <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">Accomplishments</h1>
                         <p className="text-sm text-slate-500 mt-1">Track your work and browse completed tasks by week, month, or quarter.</p>
                     </div>
-                    <button className="icloud-btn shadow-md" type="button" onClick={() => { setEditingTask(null); setShowForm((open) => !open); }}>{showForm ? 'Close form' : '+ Add task'}</button>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 bg-slate-100/60 rounded-lg p-1" role="group">
+                            <button
+                                type="button"
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                    viewMode === 'list'
+                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        : 'text-slate-600 hover:text-black'
+                                }`}
+                                onClick={() => setViewMode('list')}
+                                aria-pressed={viewMode === 'list'}
+                            >
+                                List
+                            </button>
+                            <button
+                                type="button"
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                    viewMode === 'calendar'
+                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        : 'text-slate-600 hover:text-black'
+                                }`}
+                                onClick={() => setViewMode('calendar')}
+                                aria-pressed={viewMode === 'calendar'}
+                            >
+                                Calendar
+                            </button>
+                        </div>
+                        <button className="icloud-btn shadow-md" type="button" onClick={() => { setEditingTask(null); setShowForm((open) => !open); }}>{showForm ? 'Close form' : '+ Add task'}</button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -281,15 +441,22 @@ export default function Accomplishments({ accomplishments = [] }) {
                     </section>
                 </Collapse>
 
-                <section className="icloud-card p-0 overflow-hidden">
-                    <div className="p-6 border-b border-black/[0.06] flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-bold text-[#1d1d1f]">Tasks and accomplishments</h2>
-                            <p className="text-xs text-slate-500 mt-1">{counts.completed} completed · {counts.todo} still open</p>
+                {viewMode === 'calendar' ? (
+                    <CalendarView
+                        tasks={accomplishments}
+                        currentDate={calendarDate}
+                        onDateClick={setCalendarDate}
+                    />
+                ) : (
+                    <section className="icloud-card p-0 overflow-hidden">
+                        <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
+                            <div>
+                                <h2 className="text-lg font-bold text-[#1d1d1f]">Tasks and accomplishments</h2>
+                                <p className="text-xs text-slate-500 mt-1">{counts.completed} completed · {counts.todo} still open</p>
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{accomplishments.length} total</span>
                         </div>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{accomplishments.length} total</span>
-                    </div>
-                    <div className="p-5 border-b border-black/[0.06] flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between bg-slate-50/50">
+                        <div className="p-5 border-b border-slate-200/60 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between bg-slate-50/50">
                         <div className="flex items-center gap-2" role="group">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-2">Show</span>
                             {[['all', 'All'], ['todo', 'To do'], ['completed', 'Completed']].map(([value, label]) => (
@@ -297,7 +464,7 @@ export default function Accomplishments({ accomplishments = [] }) {
                                     key={value}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                                         statusFilter === value
-                                            ? 'bg-white border-black/[0.1] text-blue-600 shadow-sm'
+                                            ? 'bg-white border-slate-200/80 text-blue-600 shadow-sm'
                                             : 'border-transparent text-slate-600 hover:text-black'
                                     }`}
                                     type="button"
@@ -315,7 +482,7 @@ export default function Accomplishments({ accomplishments = [] }) {
                                         key={value}
                                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
                                             periodFilter === value
-                                                ? 'bg-white border-black/[0.1] text-blue-600 shadow-sm'
+                                                ? 'bg-white border-slate-200/80 text-blue-600 shadow-sm'
                                                 : 'border-transparent text-slate-600 hover:text-black'
                                         }`}
                                         type="button"
@@ -325,9 +492,9 @@ export default function Accomplishments({ accomplishments = [] }) {
                                     </button>
                                 ))}
                             </div>
-                                {periodFilter === 'week' && <div className="flex items-center gap-2"><button className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/[0.1] bg-white text-black hover:bg-slate-50 transition-colors" type="button" onClick={() => shiftSelectedWeek(-1)}>‹</button><span className="text-xs font-semibold text-black min-w-[120px] text-center">{weekLabel}</span><button className="w-8 h-8 flex items-center justify-center rounded-lg border border-black/[0.1] bg-white text-black hover:bg-slate-50 transition-colors disabled:opacity-50" type="button" disabled={selectedWeek >= dateKey(currentWeekStart)} onClick={() => shiftSelectedWeek(1)}>›</button></div>}
-                                {periodFilter === 'month' && <div className="flex items-center gap-2"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Month</label><input type="month" className="h-8 px-2 text-xs rounded-lg border border-black/[0.1]" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /></div>}
-                                {periodFilter === 'quarter' && <div className="flex items-center gap-3"><div className="flex flex-col gap-1"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quarter</label><select className="h-8 px-2 text-xs rounded-lg border border-black/[0.1]" value={selectedQuarter} onChange={(event) => setSelectedQuarter(event.target.value)}>{[1, 2, 3, 4].map((quarter) => <option key={quarter} value={quarter}>Q{quarter}</option>)}</select></div><div className="flex flex-col gap-1"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Year</label><input type="number" className="h-8 px-2 text-xs rounded-lg border border-black/[0.1] w-20" min="2000" max="2100" value={selectedYear} onChange={(event) => setSelectedYear(event.target.value)} /></div></div>}
+                                {periodFilter === 'week' && <div className="flex items-center gap-2"><button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200/80 bg-white text-black hover:bg-slate-50 transition-colors" type="button" onClick={() => shiftSelectedWeek(-1)}>‹</button><span className="text-xs font-semibold text-black min-w-[120px] text-center">{weekLabel}</span><button className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200/80 bg-white text-black hover:bg-slate-50 transition-colors disabled:opacity-50" type="button" disabled={selectedWeek >= dateKey(currentWeekStart)} onClick={() => shiftSelectedWeek(1)}>›</button></div>}
+                                {periodFilter === 'month' && <div className="flex items-center gap-2"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Month</label><input type="month" className="h-8 px-2 text-xs rounded-lg border border-slate-200/80" value={selectedMonth} onChange={(event) => setSelectedMonth(event.target.value)} /></div>}
+                                {periodFilter === 'quarter' && <div className="flex items-center gap-3"><div className="flex flex-col gap-1"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quarter</label><select className="h-8 px-2 text-xs rounded-lg border border-slate-200/80" value={selectedQuarter} onChange={(event) => setSelectedQuarter(event.target.value)}>{[1, 2, 3, 4].map((quarter) => <option key={quarter} value={quarter}>Q{quarter}</option>)}</select></div><div className="flex flex-col gap-1"><label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Year</label><input type="number" className="h-8 px-2 text-xs rounded-lg border border-slate-200/80 w-20" min="2000" max="2100" value={selectedYear} onChange={(event) => setSelectedYear(event.target.value)} /></div></div>}
                         </div>
                     </div>
                     <div className="p-5">
@@ -363,14 +530,14 @@ export default function Accomplishments({ accomplishments = [] }) {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {task.status !== 'completed' && (
-                                            <button className="w-9 h-9 rounded-lg border border-black/[0.1] bg-white text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors" title="Mark complete" disabled={pendingAction !== null} onClick={() => completeTask(task)}>
+                                            <button className="w-9 h-9 rounded-lg border border-slate-200/80 bg-white text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors" title="Mark complete" disabled={pendingAction !== null} onClick={() => completeTask(task)}>
                                                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m5 12 4 4L19 6" /></svg>
                                             </button>
                                         )}
-                                        <button className="w-9 h-9 rounded-lg border border-black/[0.1] bg-white text-slate-500 flex items-center justify-center hover:bg-slate-50 transition-colors" title="Edit" onClick={() => { setShowForm(false); setEditingTask((current) => current?.id === task.id ? null : task); }}>
+                                        <button className="w-9 h-9 rounded-lg border border-slate-200/80 bg-white text-slate-500 flex items-center justify-center hover:bg-slate-50 transition-colors" title="Edit" onClick={() => { setShowForm(false); setEditingTask((current) => current?.id === task.id ? null : task); }}>
                                             <ActionIcon type="edit" />
                                         </button>
-                                        <button className="w-9 h-9 rounded-lg border border-black/[0.1] bg-white text-slate-500 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove" onClick={() => removeTask(task)}>
+                                        <button className="w-9 h-9 rounded-lg border border-slate-200/80 bg-white text-slate-500 flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors" title="Remove" onClick={() => removeTask(task)}>
                                             <ActionIcon type="remove" />
                                         </button>
                                     </div>
@@ -380,6 +547,7 @@ export default function Accomplishments({ accomplishments = [] }) {
                     )}
                     </div>
                 </section>
+                )}
             </section>
         </DashboardLayout>
     );
