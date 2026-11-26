@@ -178,7 +178,7 @@ class AccomplishmentController extends Controller
             'title' => ['required', 'string', 'max:200'],
             'description' => ['nullable', 'string', 'max:5000'],
             'due_date' => ['nullable', 'date_format:Y-m-d'],
-            'status' => ['required', Rule::in(['todo', 'completed'])],
+            'status' => ['required', Rule::in(['todo', 'completed', 'cancelled'])],
         ];
     }
 }

@@ -5,7 +5,7 @@ import Collapse from '../../Components/Collapse';
 import ActionIcon from '../../Components/ActionIcon';
 import { appUrl } from '../../url';
 
-const statusLabels = { todo: 'To do', completed: 'Completed' };
+const statusLabels = { todo: 'To do', completed: 'Completed', cancelled: 'Cancelled' };
 
 function CalendarView({ tasks, currentDate, onDateClick }) {
     const monthStart = useMemo(() => new Date(currentDate.getFullYear(), currentDate.getMonth(), 1), [currentDate]);
@@ -115,11 +115,13 @@ function CalendarView({ tasks, currentDate, onDateClick }) {
                                                     className={`text-[10px] px-1.5 py-0.5 rounded truncate ${
                                                         task.status === 'completed'
                                                             ? 'bg-emerald-50 text-emerald-700'
+                                                            : task.status === 'cancelled'
+                                                            ? 'bg-amber-50 text-amber-700'
                                                             : 'bg-blue-50 text-blue-700'
                                                     }`}
                                                     title={task.title}
                                                 >
-                                                    {task.status === 'completed' ? '✓ ' : ''}{task.title}
+                                                    {task.status === 'completed' ? '✓ ' : task.status === 'cancelled' ? '✕ ' : ''}{task.title}
                                                 </div>
                                             ))}
                                             {dayTasks.length > 3 && (
@@ -213,6 +215,7 @@ function AccomplishmentForm({ task, onCancel, onSaved }) {
                     <select className="icloud-select" value={form.data.status} onChange={(event) => form.setData('status', event.target.value)}>
                         <option value="todo">To do</option>
                         <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                     {form.errors.status && <p className="text-[0.75rem] text-icloud-danger">{form.errors.status}</p>}
                 </div>
@@ -322,6 +325,7 @@ export default function Accomplishments({ accomplishments = [] }) {
     const counts = useMemo(() => ({
         todo: accomplishments.filter((task) => task.status === 'todo').length,
         completed: accomplishments.filter((task) => task.status === 'completed').length,
+        cancelled: accomplishments.filter((task) => task.status === 'cancelled').length,
     }), [accomplishments]);
     const quarterStartMonth = Math.floor(currentDate.getMonth() / 3) * 3;
     const currentQuarterStart = `${currentDate.getFullYear()}-${String(quarterStartMonth + 1).padStart(2, '0')}-01`;
@@ -452,14 +456,14 @@ export default function Accomplishments({ accomplishments = [] }) {
                         <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
                             <div>
                                 <h2 className="text-lg font-bold text-[#1d1d1f]">Tasks and accomplishments</h2>
-                                <p className="text-xs text-slate-500 mt-1">{counts.completed} completed · {counts.todo} still open</p>
+                                <p className="text-xs text-slate-500 mt-1">{counts.completed} completed · {counts.todo} still open · {counts.cancelled} cancelled</p>
                             </div>
                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{accomplishments.length} total</span>
                         </div>
                         <div className="p-5 border-b border-slate-200/60 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between bg-slate-50/50">
                         <div className="flex items-center gap-2" role="group">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mr-2">Show</span>
-                            {[['all', 'All'], ['todo', 'To do'], ['completed', 'Completed']].map(([value, label]) => (
+                            {[['all', 'All'], ['todo', 'To do'], ['completed', 'Completed'], ['cancelled', 'Cancelled']].map(([value, label]) => (
                                 <button
                                     key={value}
                                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${
@@ -511,7 +515,13 @@ export default function Accomplishments({ accomplishments = [] }) {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1.5">
                                             <h3 className="text-sm font-bold text-[#1d1d1f]">{task.title}</h3>
-                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${task.status === 'completed' ? ' border-emerald-200 bg-emerald-50 text-emerald-700' : ' border-blue-200 bg-blue-50 text-blue-700'}`}>
+                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                                                task.status === 'completed'
+                                                    ? ' border-emerald-200 bg-emerald-50 text-emerald-700'
+                                                    : task.status === 'cancelled'
+                                                    ? ' border-amber-200 bg-amber-50 text-amber-700'
+                                                    : ' border-blue-200 bg-blue-50 text-blue-700'
+                                            }`}>
                                                 {statusLabels[task.status]}
                                             </span>
                                         </div>
