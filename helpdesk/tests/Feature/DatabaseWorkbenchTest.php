@@ -21,7 +21,7 @@ class DatabaseWorkbenchTest extends TestCase
             'database.connections.mysql.foreign_key_constraints' => false,
         ]);
         DB::purge('mysql');
-        Schema::dropIfExists('helpdesk_accomplishments');
+        Schema::dropIfExists('helpdesk_task_tracker');
         Schema::dropIfExists('helpdesk_settings');
         Schema::dropIfExists('database_workbench_items');
         Schema::dropIfExists('helpdesk_users');
@@ -41,7 +41,7 @@ class DatabaseWorkbenchTest extends TestCase
     protected function tearDown(): void
     {
         DB::setDefaultConnection('sqlite');
-        Schema::dropIfExists('helpdesk_accomplishments');
+        Schema::dropIfExists('helpdesk_task_tracker');
         Schema::dropIfExists('helpdesk_settings');
         Schema::dropIfExists('database_workbench_items');
         Schema::dropIfExists('helpdesk_users');
@@ -100,10 +100,10 @@ class DatabaseWorkbenchTest extends TestCase
         DB::connection('mysql')->table('helpdesk_settings')->insert([
             ['setting_key' => 'obsolete', 'setting_value' => 'remove from backup'],
         ]);
-        DB::table('helpdesk_accomplishments')->insert([
+        DB::table('helpdesk_task_tracker')->insert([
             ['id' => 1, 'title' => 'Local version'],
         ]);
-        DB::connection('mysql')->table('helpdesk_accomplishments')->insert([
+        DB::connection('mysql')->table('helpdesk_task_tracker')->insert([
             ['id' => 8, 'title' => 'Obsolete Aiven task'],
         ]);
 
@@ -143,8 +143,8 @@ class DatabaseWorkbenchTest extends TestCase
         $this->assertDatabaseHas('helpdesk_settings', ['setting_key' => 'shared', 'setting_value' => 'local version'], 'mysql');
         $this->assertDatabaseHas('helpdesk_settings', ['setting_key' => 'local-only', 'setting_value' => 'local only'], 'mysql');
         $this->assertDatabaseMissing('helpdesk_settings', ['setting_key' => 'obsolete'], 'mysql');
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => 1, 'title' => 'Local version'], 'mysql');
-        $this->assertDatabaseMissing('helpdesk_accomplishments', ['id' => 8], 'mysql');
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => 1, 'title' => 'Local version'], 'mysql');
+        $this->assertDatabaseMissing('helpdesk_task_tracker', ['id' => 8], 'mysql');
 
         $backups = Storage::disk('local')->files('database-backups');
         $this->assertCount(1, $backups);
@@ -159,7 +159,7 @@ class DatabaseWorkbenchTest extends TestCase
 
         DB::connection('mysql')->table('helpdesk_settings')->where('setting_key', 'shared')->update(['setting_value' => 'updated in Aiven']);
         DB::connection('mysql')->table('helpdesk_settings')->where('setting_key', 'local-only')->delete();
-        DB::connection('mysql')->table('helpdesk_accomplishments')->update(['title' => 'Restored from Aiven']);
+        DB::connection('mysql')->table('helpdesk_task_tracker')->update(['title' => 'Restored from Aiven']);
         $reversePreview = $this->withSession($session)
             ->postJson('/admin/database/backup/preview', ['operation' => 'restore'])
             ->assertOk()
@@ -175,7 +175,7 @@ class DatabaseWorkbenchTest extends TestCase
             ->assertSessionHas('backupSnapshot');
         $this->assertDatabaseHas('helpdesk_settings', ['setting_key' => 'shared', 'setting_value' => 'updated in Aiven']);
         $this->assertDatabaseMissing('helpdesk_settings', ['setting_key' => 'local-only']);
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => 1, 'title' => 'Restored from Aiven']);
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => 1, 'title' => 'Restored from Aiven']);
         $this->assertCount(2, Storage::disk('local')->files('database-backups'));
     }
 
@@ -281,7 +281,7 @@ class DatabaseWorkbenchTest extends TestCase
 
         foreach (['sqlite', 'mysql'] as $connection) {
             $schema = Schema::connection($connection);
-            foreach (['helpdesk_users', 'helpdesk_settings', 'helpdesk_notification_settings', 'helpdesk_accomplishments', 'migrations'] as $table) {
+            foreach (['helpdesk_users', 'helpdesk_settings', 'helpdesk_notification_settings', 'helpdesk_task_tracker', 'migrations'] as $table) {
                 $schema->dropIfExists($table);
             }
             $schema->create('helpdesk_users', function ($table): void {
@@ -297,7 +297,7 @@ class DatabaseWorkbenchTest extends TestCase
                 $table->unsignedBigInteger('admin_id')->primary();
                 $table->boolean('enabled');
             });
-            $schema->create('helpdesk_accomplishments', function ($table): void {
+            $schema->create('helpdesk_task_tracker', function ($table): void {
                 $table->id();
                 $table->string('title');
             });

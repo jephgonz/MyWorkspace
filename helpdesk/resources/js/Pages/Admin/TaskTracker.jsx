@@ -168,11 +168,11 @@ function CompletionChart({ items, label }) {
     const chartDescription = items.map((item) => `${item.label}: ${item.count}`).join(', ');
 
     return (
-        <div className="accomplishment-stat-chart" role="img" aria-label={`${label}. ${chartDescription}`}>
+        <div className="task-stat-chart" role="img" aria-label={`${label}. ${chartDescription}`}>
             {items.map((item) => (
-                <div className="accomplishment-stat-chart-item" key={item.label} title={`${item.label}: ${item.count}`}>
+                <div className="task-stat-chart-item" key={item.label} title={`${item.label}: ${item.count}`}>
                     <small className="text-[0.7rem] text-icloud-text-tertiary">{item.count}</small>
-                    <div className="accomplishment-stat-chart-track"><span style={{ height: `${Math.max((item.count / maxCount) * 100, 4)}%` }} /></div>
+                    <div className="task-stat-chart-track"><span style={{ height: `${Math.max((item.count / maxCount) * 100, 4)}%` }} /></div>
                     <span className="text-[0.7rem] text-icloud-text-secondary">{item.label}</span>
                 </div>
             ))}
@@ -180,7 +180,7 @@ function CompletionChart({ items, label }) {
     );
 }
 
-function AccomplishmentForm({ task, onCancel, onSaved }) {
+function TaskForm({ task, onCancel, onSaved }) {
     const form = useForm({
         title: task?.title || '',
         description: task?.description || '',
@@ -189,7 +189,7 @@ function AccomplishmentForm({ task, onCancel, onSaved }) {
     });
     const submit = (event) => {
         event.preventDefault();
-        form.post(appUrl(task ? `/admin/accomplishments/${task.id}` : '/admin/accomplishments'), { onSuccess: onSaved });
+        form.post(appUrl(task ? `/admin/task-tracker/${task.id}` : '/admin/task-tracker'), { onSuccess: onSaved });
     };
 
     return (
@@ -204,7 +204,7 @@ function AccomplishmentForm({ task, onCancel, onSaved }) {
                 <textarea className="icloud-input icloud-textarea" value={form.data.description} onChange={(event) => form.setData('description', event.target.value)} rows="3" maxLength="5000" placeholder="Add context or an outcome for your report." />
                 {form.errors.description && <p className="text-[0.75rem] text-icloud-danger">{form.errors.description}</p>}
             </div>
-            <div className="accomplishment-form-row grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="task-form-row grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="field flex flex-col gap-1.5">
                     <label className="icloud-label">Due date</label>
                     <input type="date" className="icloud-input" value={form.data.due_date} onChange={(event) => form.setData('due_date', event.target.value)} />
@@ -229,7 +229,7 @@ function AccomplishmentForm({ task, onCancel, onSaved }) {
     );
 }
 
-export default function Accomplishments({ accomplishments = [] }) {
+export default function TaskTracker({ tasks = [] }) {
     const currentDate = useMemo(() => new Date(), []);
     const currentWeekStart = useMemo(() => startOfWeek(currentDate), [currentDate]);
     const [statusFilter, setStatusFilter] = useState('all');
@@ -263,7 +263,7 @@ export default function Accomplishments({ accomplishments = [] }) {
         let weekCount = 0;
         let monthCount = 0;
 
-        accomplishments.forEach((task) => {
+        tasks.forEach((task) => {
             if (task.status !== 'completed' || !task.completed_at) return;
             const completionDate = task.completed_at.slice(0, 10);
             if (completionDate >= weekStartKey && completionDate < weekEndKey) {
@@ -291,7 +291,7 @@ export default function Accomplishments({ accomplishments = [] }) {
             monthLabel: currentDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
             monthItems,
         };
-    }, [accomplishments, currentDate]);
+    }, [tasks, currentDate]);
     const periodRange = useMemo(() => {
         if (periodFilter === 'week') {
             const [year, month, day] = selectedWeek.split('-').map(Number);
@@ -323,16 +323,16 @@ export default function Accomplishments({ accomplishments = [] }) {
         return null;
     }, [periodFilter, selectedMonth, selectedQuarter, selectedWeek, selectedYear]);
     const counts = useMemo(() => ({
-        todo: accomplishments.filter((task) => task.status === 'todo').length,
-        completed: accomplishments.filter((task) => task.status === 'completed').length,
-        cancelled: accomplishments.filter((task) => task.status === 'cancelled').length,
-    }), [accomplishments]);
+        todo: tasks.filter((task) => task.status === 'todo').length,
+        completed: tasks.filter((task) => task.status === 'completed').length,
+        cancelled: tasks.filter((task) => task.status === 'cancelled').length,
+    }), [tasks]);
     const quarterStartMonth = Math.floor(currentDate.getMonth() / 3) * 3;
     const currentQuarterStart = `${currentDate.getFullYear()}-${String(quarterStartMonth + 1).padStart(2, '0')}-01`;
     const currentQuarterEnd = dateKey(new Date(currentDate.getFullYear(), quarterStartMonth + 3, 1));
-    const completedThisQuarter = accomplishments.filter((task) => task.status === 'completed' && task.completed_at >= currentQuarterStart && task.completed_at < currentQuarterEnd).length;
+    const completedThisQuarter = tasks.filter((task) => task.status === 'completed' && task.completed_at >= currentQuarterStart && task.completed_at < currentQuarterEnd).length;
     const currentQuarter = Math.floor(currentDate.getMonth() / 3) + 1;
-    const visibleTasks = accomplishments.filter((task) => {
+    const visibleTasks = tasks.filter((task) => {
         if (periodFilter !== 'all') {
             if (!periodRange) return false;
             return task.status === 'completed'
@@ -358,27 +358,27 @@ export default function Accomplishments({ accomplishments = [] }) {
     };
     const closeForm = () => { setShowForm(false); setEditingTask(null); };
     const removeTask = (task) => {
-        if (window.confirm(`Remove "${task.title}" from your accomplishment board?`)) {
+        if (window.confirm(`Remove "${task.title}" from your task board?`)) {
             setPendingAction({ id: task.id, action: 'remove' });
-            router.post(appUrl(`/admin/accomplishments/${task.id}/delete`), {}, {
+            router.post(appUrl(`/admin/task-tracker/${task.id}/delete`), {}, {
                 onFinish: () => setPendingAction(null),
             });
         }
     };
     const completeTask = (task) => {
         setPendingAction({ id: task.id, action: 'complete' });
-        router.post(appUrl(`/admin/accomplishments/${task.id}/complete`), {}, {
+        router.post(appUrl(`/admin/task-tracker/${task.id}/complete`), {}, {
             onFinish: () => setPendingAction(null),
         });
     };
 
     return (
-        <DashboardLayout title="Accomplishments" activePage="accomplishments">
+        <DashboardLayout title="Task Tracker" activePage="task-tracker">
             <section className="space-y-6">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
                         <p className="text-[10px] font-bold text-blue-600 tracking-widest uppercase">Personal Work Tracker</p>
-                        <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">Accomplishments</h1>
+                        <h1 className="text-3xl font-extrabold text-[#1d1d1f] tracking-tight mt-1">Task Tracker</h1>
                         <p className="text-sm text-slate-500 mt-1">Track your work and browse completed tasks by week, month, or quarter.</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -438,16 +438,16 @@ export default function Accomplishments({ accomplishments = [] }) {
                     <section className="icloud-card p-6 mb-6">
                         <div className="mb-6">
                             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">New task</p>
-                            <h2 className="text-xl font-bold text-[#1d1d1f] mt-1">Add an accomplishment</h2>
+                            <h2 className="text-xl font-bold text-[#1d1d1f] mt-1">Add a task</h2>
                             <p className="text-sm text-slate-500 mt-1">Completed tasks are dated automatically.</p>
                         </div>
-                        <AccomplishmentForm key="new" onCancel={closeForm} onSaved={closeForm} />
+                        <TaskForm key="new" onCancel={closeForm} onSaved={closeForm} />
                     </section>
                 </Collapse>
 
                 {viewMode === 'calendar' ? (
                     <CalendarView
-                        tasks={accomplishments}
+                        tasks={tasks}
                         currentDate={calendarDate}
                         onDateClick={setCalendarDate}
                     />
@@ -455,10 +455,10 @@ export default function Accomplishments({ accomplishments = [] }) {
                     <section className="icloud-card p-0 overflow-hidden">
                         <div className="p-6 border-b border-slate-200/60 flex items-center justify-between">
                             <div>
-                                <h2 className="text-lg font-bold text-[#1d1d1f]">Tasks and accomplishments</h2>
+                                <h2 className="text-lg font-bold text-[#1d1d1f]">Tasks</h2>
                                 <p className="text-xs text-slate-500 mt-1">{counts.completed} completed · {counts.todo} still open · {counts.cancelled} cancelled</p>
                             </div>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{accomplishments.length} total</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{tasks.length} total</span>
                         </div>
                         <div className="p-5 border-b border-slate-200/60 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between bg-slate-50/50">
                         <div className="flex items-center gap-2" role="group">
@@ -505,8 +505,8 @@ export default function Accomplishments({ accomplishments = [] }) {
                         {visibleTasks.length === 0 ? (
                         <div className="text-center py-16">
                             <span className="text-4xl mb-3 block">✓</span>
-                            <strong className="text-lg font-medium text-[#1d1d1f] block">{accomplishments.length === 0 ? 'Your board is ready' : 'No tasks in this view'}</strong>
-                            <p className="mt-1 text-sm text-slate-500">{accomplishments.length === 0 ? 'Add your first task to start tracking your work.' : 'Choose another filter to see more tasks.'}</p>
+                            <strong className="text-lg font-medium text-[#1d1d1f] block">{tasks.length === 0 ? 'Your board is ready' : 'No tasks in this view'}</strong>
+                            <p className="mt-1 text-sm text-slate-500">{tasks.length === 0 ? 'Add your first task to start tracking your work.' : 'Choose another filter to see more tasks.'}</p>
                         </div>
                     ) : (
                         <div className="space-y-3 p-5">
@@ -533,7 +533,7 @@ export default function Accomplishments({ accomplishments = [] }) {
                                         {editingTask?.id === task.id && (
                                             <Collapse open>
                                                 <div className="mt-4 border-t pt-4">
-                                                    <AccomplishmentForm key={task.id} task={task} onCancel={() => setEditingTask(null)} onSaved={() => setEditingTask(null)} />
+                                                    <TaskForm key={task.id} task={task} onCancel={() => setEditingTask(null)} onSaved={() => setEditingTask(null)} />
                                                 </div>
                                             </Collapse>
                                         )}

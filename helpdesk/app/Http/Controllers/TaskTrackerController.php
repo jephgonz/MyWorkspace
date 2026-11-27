@@ -10,12 +10,12 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class AccomplishmentController extends Controller
+class TaskTrackerController extends Controller
 {
     public function index(Request $request): Response
     {
         try {
-            $accomplishments = DB::table('helpdesk_accomplishments')
+            $tasks = DB::table('helpdesk_task_tracker')
                 ->where('created_by', $request->session()->get('user.id'))
                 ->orderByRaw("CASE status WHEN 'todo' THEN 0 ELSE 1 END")
                 ->orderByRaw("CASE WHEN status = 'todo' AND due_date IS NULL THEN 1 ELSE 0 END")
@@ -33,14 +33,14 @@ class AccomplishmentController extends Controller
                     'updated_at',
                 ]);
         } catch (\Throwable $exception) {
-            Log::error('Accomplishment board could not load.', ['exception' => $exception]);
-            $accomplishments = collect();
-            session()->flash('error', 'The accomplishment board is unavailable. Check that the application database is up to date.');
+            Log::error('Task tracker board could not load.', ['exception' => $exception]);
+            $tasks = collect();
+            session()->flash('error', 'The task tracker board is unavailable. Check that the application database is up to date.');
         }
 
-        return Inertia::render('Admin/Accomplishments', [
-            'accomplishments' => $accomplishments,
-            'activePage' => 'accomplishments',
+        return Inertia::render('Admin/TaskTracker', [
+            'tasks' => $tasks,
+            'activePage' => 'task-tracker',
         ]);
     }
 
@@ -49,7 +49,7 @@ class AccomplishmentController extends Controller
         $validated = $request->validate($this->rules());
 
         try {
-            DB::table('helpdesk_accomplishments')->insert([
+            DB::table('helpdesk_task_tracker')->insert([
                 'created_by' => $request->session()->get('user.id'),
                 'title' => trim($validated['title']),
                 'description' => isset($validated['description']) ? trim($validated['description']) : null,
@@ -60,35 +60,35 @@ class AccomplishmentController extends Controller
                 'updated_at' => now(),
             ]);
         } catch (\Throwable $exception) {
-            Log::error('Accomplishment could not be created.', ['exception' => $exception]);
+            Log::error('Task could not be created.', ['exception' => $exception]);
 
-            return back()->withErrors(['form' => 'The accomplishment could not be saved. Check the database connection and schema.']);
+            return back()->withErrors(['form' => 'The task could not be saved. Check the database connection and schema.']);
         }
 
-        return back()->with('success', 'Accomplishment added to your board.');
+        return back()->with('success', 'Task added to your board.');
     }
 
-    public function update(Request $request, int $accomplishment): RedirectResponse
+    public function update(Request $request, int $task): RedirectResponse
     {
         $validated = $request->validate($this->rules());
         $userId = $request->session()->get('user.id');
 
         try {
-            $updated = DB::transaction(function () use ($validated, $userId, $accomplishment): bool {
-                $task = DB::table('helpdesk_accomplishments')
-                    ->where('id', $accomplishment)
+            $updated = DB::transaction(function () use ($validated, $userId, $task): bool {
+                $taskRecord = DB::table('helpdesk_task_tracker')
+                    ->where('id', $task)
                     ->where('created_by', $userId)
                     ->lockForUpdate()
                     ->first(['status', 'completed_at']);
-                if (! $task) {
+                if (! $taskRecord) {
                     return false;
                 }
 
                 $completedAt = $validated['status'] === 'completed'
-                    ? ($task->status === 'completed' && $task->completed_at !== null ? $task->completed_at : now())
+                    ? ($taskRecord->status === 'completed' && $taskRecord->completed_at !== null ? $taskRecord->completed_at : now())
                     : null;
-                DB::table('helpdesk_accomplishments')
-                    ->where('id', $accomplishment)
+                DB::table('helpdesk_task_tracker')
+                    ->where('id', $task)
                     ->where('created_by', $userId)
                     ->update([
                         'title' => trim($validated['title']),
@@ -102,35 +102,35 @@ class AccomplishmentController extends Controller
                 return true;
             });
             if (! $updated) {
-                return back()->withErrors(['form' => 'The accomplishment was not found on your board.']);
+                return back()->withErrors(['form' => 'The task was not found on your board.']);
             }
         } catch (\Throwable $exception) {
-            Log::error('Accomplishment could not be updated.', ['exception' => $exception, 'accomplishment_id' => $accomplishment]);
+            Log::error('Task could not be updated.', ['exception' => $exception, 'task_id' => $task]);
 
-            return back()->withErrors(['form' => 'The accomplishment could not be updated.']);
+            return back()->withErrors(['form' => 'The task could not be updated.']);
         }
 
-        return back()->with('success', 'Accomplishment updated.');
+        return back()->with('success', 'Task updated.');
     }
 
-    public function complete(Request $request, int $accomplishment): RedirectResponse
+    public function complete(Request $request, int $task): RedirectResponse
     {
         $userId = $request->session()->get('user.id');
 
         try {
-            $updated = DB::transaction(function () use ($userId, $accomplishment): bool {
-                $task = DB::table('helpdesk_accomplishments')
-                    ->where('id', $accomplishment)
+            $updated = DB::transaction(function () use ($userId, $task): bool {
+                $taskRecord = DB::table('helpdesk_task_tracker')
+                    ->where('id', $task)
                     ->where('created_by', $userId)
                     ->lockForUpdate()
                     ->first(['status', 'completed_at']);
-                if (! $task) {
+                if (! $taskRecord) {
                     return false;
                 }
 
-                if ($task->status !== 'completed') {
-                    DB::table('helpdesk_accomplishments')
-                        ->where('id', $accomplishment)
+                if ($taskRecord->status !== 'completed') {
+                    DB::table('helpdesk_task_tracker')
+                        ->where('id', $task)
                         ->where('created_by', $userId)
                         ->update([
                             'status' => 'completed',
@@ -142,34 +142,34 @@ class AccomplishmentController extends Controller
                 return true;
             });
             if (! $updated) {
-                return back()->withErrors(['form' => 'The accomplishment was not found on your board.']);
+                return back()->withErrors(['form' => 'The task was not found on your board.']);
             }
         } catch (\Throwable $exception) {
-            Log::error('Accomplishment could not be completed.', ['exception' => $exception, 'accomplishment_id' => $accomplishment]);
+            Log::error('Task could not be completed.', ['exception' => $exception, 'task_id' => $task]);
 
-            return back()->withErrors(['form' => 'The accomplishment could not be marked complete.']);
+            return back()->withErrors(['form' => 'The task could not be marked complete.']);
         }
 
-        return back()->with('success', 'Accomplishment marked complete.');
+        return back()->with('success', 'Task marked complete.');
     }
 
-    public function destroy(Request $request, int $accomplishment): RedirectResponse
+    public function destroy(Request $request, int $task): RedirectResponse
     {
         try {
-            $deleted = DB::table('helpdesk_accomplishments')
-                ->where('id', $accomplishment)
+            $deleted = DB::table('helpdesk_task_tracker')
+                ->where('id', $task)
                 ->where('created_by', $request->session()->get('user.id'))
                 ->delete();
             if ($deleted === 0) {
-                return back()->withErrors(['form' => 'The accomplishment was not found on your board.']);
+                return back()->withErrors(['form' => 'The task was not found on your board.']);
             }
         } catch (\Throwable $exception) {
-            Log::error('Accomplishment could not be deleted.', ['exception' => $exception, 'accomplishment_id' => $accomplishment]);
+            Log::error('Task could not be deleted.', ['exception' => $exception, 'task_id' => $task]);
 
-            return back()->withErrors(['form' => 'The accomplishment could not be deleted.']);
+            return back()->withErrors(['form' => 'The task could not be deleted.']);
         }
 
-        return back()->with('success', 'Accomplishment removed from your board.');
+        return back()->with('success', 'Task removed from your board.');
     }
 
     private function rules(): array

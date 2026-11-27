@@ -15,7 +15,7 @@ After all migrations, these tables remain active:
 | Table | Purpose |
 |-------|---------|
 | `helpdesk_users` | Administrator accounts (username, email, password_hash, role: admin/staff, is_active) |
-| `helpdesk_accomplishments` | Tasks with title, description, due_date, status (todo/done), completed_at, created_by |
+| `helpdesk_task_tracker` | Tasks with title, description, due_date, status (todo/done), completed_at, created_by |
 | `helpdesk_notification_settings` | Per-admin browser notification preferences (task_due, etc.) |
 | `helpdesk_settings` | Key-value settings (monthly CSV targets, base amounts, SP ID generator config) |
 | `migrations` | Laravel migration history |
@@ -29,10 +29,10 @@ After all migrations, these tables remain active:
 ### Administrator Dashboard (`/admin`)
 Overview of tasks, quick actions, and notification status.
 
-### Task Management (`/admin/accomplishments`)
+### Task Tracker (`/admin/task-tracker`)
 - Create, update, complete, delete tasks
 - Due dates with browser notification reminders
-- Status: `todo` → `done` (with `completed_at` timestamp)
+- Status: `todo`, `completed`, `cancelled` (with `completed_at` timestamp)
 - Indexed by owner + status + created_at for performance
 
 ### Administrator Accounts (`/admin/users`)
@@ -50,7 +50,7 @@ Overview of tasks, quick actions, and notification status.
 - **Restore from remote MySQL** — preview → confirm → snapshots local → replaces managed tables
 - **Row-level CRUD** (create/edit/delete records in any table)
 - **Metrics** — row counts, table sizes, remote sync status
-- Managed tables: users, settings, notification_settings, accomplishments, migrations
+- Managed tables: users, settings, notification_settings, task_tracker, migrations
 - 20,000 row cap per table per database
 - Private snapshots in `storage/app/private/database-backups/`
 
@@ -191,7 +191,7 @@ All admin routes under `/admin` prefix with `admin` middleware (`EnsureAdmin`).
 |------------|--------|
 | `AuthController` | login, logout |
 | `DashboardController` | admin dashboard |
-| `AccomplishmentController` | CRUD tasks |
+| `TaskTrackerController` | CRUD tasks |
 | `UserController` | CRUD admins, toggle status |
 | `DatabaseController` | full DB toolkit |
 | `IdGeneratorController` | ID cards (generate, preview, download) |

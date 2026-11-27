@@ -67,7 +67,7 @@ class BrowserNotificationController extends Controller
             }
 
             if ($settings['task_due']) {
-                $tasks = DB::table('helpdesk_accomplishments')
+                $tasks = DB::table('helpdesk_task_tracker')
                     ->where('created_by', $adminId)
                     ->whereIn('status', ['todo', 'in_progress'])
                     ->whereDate('due_date', now()->toDateString())
@@ -79,7 +79,7 @@ class BrowserNotificationController extends Controller
                         'id' => 'task-due-'.$task->id.'-'.now()->toDateString(),
                         'title' => 'Task due today',
                         'body' => $task->title,
-                        'url' => '/admin/accomplishments',
+                        'url' => '/admin/task-tracker',
                     ];
                 }
             }

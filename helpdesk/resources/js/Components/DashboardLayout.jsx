@@ -10,7 +10,7 @@ const navGroups = [
         title: 'GENERAL',
         links: [
             { key: 'overview', label: 'Dashboard', icon: 'dashboard', href: '/admin' },
-            { key: 'accomplishments', label: 'Accomplishments', icon: 'accomplishments', href: '/admin/accomplishments' },
+            { key: 'task-tracker', label: 'Task Tracker', icon: 'task-tracker', href: '/admin/task-tracker' },
         ],
     },
     {
@@ -48,7 +48,7 @@ function NavIcon({ name, active }) {
                     <rect x="3" y="14" width="7" height="7" rx="1.5" />
                 </svg>
             );
-        case 'accomplishments':
+        case 'task-tracker':
             return (
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M9 11l3 3L22 4" />

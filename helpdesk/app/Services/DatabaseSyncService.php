@@ -12,7 +12,7 @@ class DatabaseSyncService
         'helpdesk_users',
         'helpdesk_settings',
         'helpdesk_notification_settings',
-        'helpdesk_accomplishments',
+        'helpdesk_task_tracker',
         'migrations',
     ];
 

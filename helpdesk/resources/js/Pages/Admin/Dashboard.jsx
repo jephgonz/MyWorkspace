@@ -5,8 +5,8 @@ import { appUrl } from '../../url';
 
 const tools = [
     {
-        key: 'accomplishments',
-        label: 'Accomplishments',
+        key: 'task-tracker',
+        label: 'Task Tracker',
         icon: (
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 11l3 3L22 4" />
@@ -17,7 +17,7 @@ const tools = [
         gradFrom: 'from-blue-500/10',
         borderColor: 'group-hover:border-blue-500/30',
         shadowColor: 'group-hover:shadow-[0_8px_30px_rgba(0,113,227,0.12)]',
-        href: '/admin/accomplishments',
+        href: '/admin/task-tracker',
         desc: 'Track tasks, milestones, and quarterly completion reports.',
     },
     {
@@ -127,7 +127,7 @@ export default function Dashboard({
 
                     <div className="flex items-center gap-3">
                         <Link
-                            href={appUrl('/admin/accomplishments')}
+                            href={appUrl('/admin/task-tracker')}
                             className="icloud-btn shadow-lg"
                         >
                             <span>View Task Board</span>
@@ -140,7 +140,7 @@ export default function Dashboard({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Card 1: Pending Tasks */}
                     <Link
-                        href={appUrl('/admin/accomplishments')}
+                        href={appUrl('/admin/task-tracker')}
                         className="icloud-card p-6 group block"
                     >
                         <div className="flex items-center justify-between">
@@ -183,7 +183,7 @@ export default function Dashboard({
                         <div className="mt-5 flex items-baseline justify-between">
                             <div>
                                 <span className="text-4xl font-extrabold text-[#1d1d1f] tracking-tight">{completedThisQuarterCount}</span>
-                                <p className="text-xs text-slate-500 mt-1 font-medium">Accomplishments logged</p>
+                                <p className="text-xs text-slate-500 mt-1 font-medium">Tasks completed</p>
                             </div>
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">
                                 Q4 Goal
@@ -233,7 +233,7 @@ export default function Dashboard({
                                 </span>
                                 <h2 className="text-base font-bold text-[#1d1d1f]">Upcoming Tasks</h2>
                             </div>
-                            <Link href={appUrl('/admin/accomplishments')} className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                            <Link href={appUrl('/admin/task-tracker')} className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
                                 View all items →
                             </Link>
                         </div>
@@ -246,7 +246,7 @@ export default function Dashboard({
                                         <p className="text-xs text-slate-500 mt-0.5">Due: {formatDueDate(task.due_date)}</p>
                                     </div>
                                     <Link
-                                        href={appUrl('/admin/accomplishments')}
+                                        href={appUrl('/admin/task-tracker')}
                                         className="icloud-btn-secondary h-8 px-4 text-xs"
                                     >
                                         Open

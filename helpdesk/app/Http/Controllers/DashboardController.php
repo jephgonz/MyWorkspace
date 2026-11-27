@@ -33,7 +33,7 @@ class DashboardController extends Controller
         try {
             $quarterStartsAt = now()->startOfQuarter();
             $nextQuarterStartsAt = $quarterStartsAt->copy()->addQuarter();
-            $taskSummary = DB::table('helpdesk_accomplishments')
+            $taskSummary = DB::table('helpdesk_task_tracker')
                 ->where('created_by', $request->session()->get('user.id'))
                 ->selectRaw(
                     "SUM(CASE WHEN status = 'todo' THEN 1 ELSE 0 END) as pending_count, SUM(CASE WHEN status = 'completed' AND completed_at >= ? AND completed_at < ? THEN 1 ELSE 0 END) as completed_this_quarter",
@@ -42,7 +42,7 @@ class DashboardController extends Controller
                 ->first();
             $pendingTaskCount = (int) ($taskSummary->pending_count ?? 0);
             $completedThisQuarterCount = (int) ($taskSummary->completed_this_quarter ?? 0);
-            $openTasks = DB::table('helpdesk_accomplishments')
+            $openTasks = DB::table('helpdesk_task_tracker')
                 ->where('created_by', $request->session()->get('user.id'))
                 ->where('status', 'todo');
             $openTaskCount = $pendingTaskCount;

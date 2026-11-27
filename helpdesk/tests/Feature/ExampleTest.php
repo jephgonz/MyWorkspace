@@ -132,7 +132,7 @@ class ExampleTest extends TestCase
             ['id' => 1, 'display_name' => 'Admin One', 'username' => null, 'email' => 'admin@example.com', 'role' => 'admin', 'is_active' => 1, 'created_at' => now()],
             ['id' => 2, 'display_name' => 'Admin Two', 'username' => null, 'email' => 'other@example.com', 'role' => 'admin', 'is_active' => 1, 'created_at' => now()],
         ]);
-        Schema::create('helpdesk_accomplishments', function ($table): void {
+        Schema::create('helpdesk_task_tracker', function ($table): void {
             $table->id();
             $table->unsignedBigInteger('created_by');
             $table->string('title', 200);
@@ -142,7 +142,7 @@ class ExampleTest extends TestCase
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
         });
-        DB::table('helpdesk_accomplishments')->insert([
+        DB::table('helpdesk_task_tracker')->insert([
             ['created_by' => 1, 'title' => 'Prepare report', 'description' => null, 'due_date' => '2026-11-10', 'status' => 'todo', 'completed_at' => null, 'created_at' => now(), 'updated_at' => now()],
             ['created_by' => 1, 'title' => 'Review requests', 'description' => null, 'due_date' => '2026-11-05', 'status' => 'todo', 'completed_at' => null, 'created_at' => now(), 'updated_at' => now()],
             ['created_by' => 1, 'title' => 'Finished work', 'description' => null, 'due_date' => null, 'status' => 'completed', 'completed_at' => now(), 'created_at' => now(), 'updated_at' => now()],
@@ -164,7 +164,7 @@ class ExampleTest extends TestCase
                 ->where('pendingTasks.0.title', 'Review requests')
                 ->where('pendingTasks.1.title', 'Prepare report'));
 
-        Schema::drop('helpdesk_accomplishments');
+        Schema::drop('helpdesk_task_tracker');
         Schema::drop('helpdesk_users');
     }
 
@@ -679,7 +679,7 @@ class ExampleTest extends TestCase
     public function test_browser_notification_poll_returns_due_tasks(): void
     {
         $this->createNotificationTables();
-        Schema::create('helpdesk_accomplishments', function ($table): void {
+        Schema::create('helpdesk_task_tracker', function ($table): void {
             $table->id();
             $table->unsignedBigInteger('created_by');
             $table->string('title', 200);
@@ -696,7 +696,7 @@ class ExampleTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        DB::table('helpdesk_accomplishments')->insert([
+        DB::table('helpdesk_task_tracker')->insert([
             ['created_by' => 1, 'title' => 'Submit report', 'description' => null, 'due_date' => now()->toDateString(), 'status' => 'todo', 'completed_at' => null, 'created_at' => now(), 'updated_at' => now()],
             ['created_by' => 2, 'title' => 'Another admin task', 'description' => null, 'due_date' => now()->toDateString(), 'status' => 'todo', 'completed_at' => null, 'created_at' => now(), 'updated_at' => now()],
         ]);
@@ -709,7 +709,7 @@ class ExampleTest extends TestCase
         $events = collect($response->json('events'));
         $this->assertTrue($events->contains(fn (array $event): bool => $event['title'] === 'Task due today' && $event['body'] === 'Submit report'));
 
-        Schema::drop('helpdesk_accomplishments');
+        Schema::drop('helpdesk_task_tracker');
         Schema::drop('helpdesk_notification_settings');
         Schema::drop('helpdesk_users');
     }
@@ -733,10 +733,10 @@ class ExampleTest extends TestCase
         });
     }
 
-    public function test_accomplishment_board_tracks_only_the_current_admin_tasks(): void
+    public function test_task_tracker_tracks_only_the_current_admin_tasks(): void
     {
-        $this->createAccomplishmentTables();
-        DB::table('helpdesk_accomplishments')->insert([
+        $this->createTaskTrackerTables();
+        DB::table('helpdesk_task_tracker')->insert([
             ['created_by' => 1, 'title' => 'Todo without due date', 'description' => null, 'due_date' => null, 'status' => 'todo', 'completed_at' => null, 'created_at' => '2026-10-20 10:00:00', 'updated_at' => '2026-10-20 10:00:00'],
             ['created_by' => 1, 'title' => 'Todo with due date', 'description' => null, 'due_date' => '2026-11-06', 'status' => 'todo', 'completed_at' => null, 'created_at' => '2026-10-19 10:00:00', 'updated_at' => '2026-10-19 10:00:00'],
             ['created_by' => 1, 'title' => 'Recently completed', 'description' => null, 'due_date' => '2026-10-01', 'status' => 'completed', 'completed_at' => '2026-11-03 10:00:00', 'created_at' => '2026-10-18 10:00:00', 'updated_at' => '2026-11-03 10:00:00'],
@@ -746,79 +746,79 @@ class ExampleTest extends TestCase
         ]);
         $session = ['user' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin']];
 
-        $this->withSession($session)->get('/admin/accomplishments')
+        $this->withSession($session)->get('/admin/task-tracker')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Admin/Accomplishments')
-                ->where('activePage', 'accomplishments')
-                ->has('accomplishments', 5)
-                ->where('accomplishments.0.title', 'Todo with due date')
-                ->where('accomplishments.1.title', 'Todo without due date')
-                ->where('accomplishments.2.title', 'Recently completed')
-                ->where('accomplishments.3.title', 'Quarterly service update')
-                ->where('accomplishments.4.title', '=SUM(1,1)'));
+                ->component('Admin/TaskTracker')
+                ->where('activePage', 'task-tracker')
+                ->has('tasks', 5)
+                ->where('tasks.0.title', 'Todo with due date')
+                ->where('tasks.1.title', 'Todo without due date')
+                ->where('tasks.2.title', 'Recently completed')
+                ->where('tasks.3.title', 'Quarterly service update')
+                ->where('tasks.4.title', '=SUM(1,1)'));
 
-        $this->withSession($session)->get('/admin/accomplishments/report?year=2026&quarter=4')
+        $this->withSession($session)->get('/admin/task-tracker/report?year=2026&quarter=4')
             ->assertMethodNotAllowed();
 
-        Schema::drop('helpdesk_accomplishments');
+        Schema::drop('helpdesk_task_tracker');
     }
 
-    public function test_accomplishment_board_creates_updates_and_deletes_owned_tasks(): void
+    public function test_task_tracker_creates_updates_and_deletes_owned_tasks(): void
     {
-        $this->createAccomplishmentTables();
+        $this->createTaskTrackerTables();
         $session = ['user' => ['id' => 1, 'name' => 'Admin', 'role' => 'admin']];
 
-        $this->withSession($session)->post('/admin/accomplishments', [
+        $this->withSession($session)->post('/admin/task-tracker', [
             'title' => 'Prepare quarterly report',
             'description' => 'Collect completed work.',
             'due_date' => '2026-12-31',
             'status' => 'todo',
         ])->assertRedirect();
-        $taskId = DB::table('helpdesk_accomplishments')->value('id');
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => $taskId, 'created_by' => 1, 'status' => 'todo']);
+        $taskId = DB::table('helpdesk_task_tracker')->value('id');
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => $taskId, 'created_by' => 1, 'status' => 'todo']);
 
-        $this->withSession($session)->post("/admin/accomplishments/{$taskId}", [
+        $this->withSession($session)->post("/admin/task-tracker/{$taskId}", [
             'title' => 'Prepare quarterly report',
             'description' => 'Collect completed work.',
             'due_date' => '2026-12-31',
             'status' => 'in_progress',
         ])->assertSessionHasErrors('status');
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => $taskId, 'status' => 'todo']);
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => $taskId, 'status' => 'todo']);
 
         $this->withSession(['user' => ['id' => 2, 'name' => 'Other Admin', 'role' => 'admin']])
-            ->post("/admin/accomplishments/{$taskId}/complete")
+            ->post("/admin/task-tracker/{$taskId}/complete")
             ->assertSessionHasErrors('form');
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => $taskId, 'status' => 'todo']);
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => $taskId, 'status' => 'todo']);
 
-        $this->withSession($session)->post("/admin/accomplishments/{$taskId}/complete")
+        $this->withSession($session)->post("/admin/task-tracker/{$taskId}/complete")
             ->assertRedirect()
-            ->assertSessionHas('success', 'Accomplishment marked complete.');
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => $taskId, 'status' => 'completed']);
-        $this->assertNotNull(DB::table('helpdesk_accomplishments')->where('id', $taskId)->value('completed_at'));
+            ->assertSessionHas('success', 'Task marked complete.');
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => $taskId, 'status' => 'completed']);
+        $this->assertNotNull(DB::table('helpdesk_task_tracker')->where('id', $taskId)->value('completed_at'));
 
-        $this->withSession($session)->post("/admin/accomplishments/{$taskId}", [
+        $this->withSession($session)->post("/admin/task-tracker/{$taskId}", [
             'title' => 'Prepare quarterly report',
             'description' => 'Report is ready.',
             'due_date' => '2026-12-31',
             'status' => 'completed',
         ])->assertRedirect();
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => $taskId, 'status' => 'completed']);
-        $this->assertNotNull(DB::table('helpdesk_accomplishments')->where('id', $taskId)->value('completed_at'));
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => $taskId, 'status' => 'completed']);
+        $this->assertNotNull(DB::table('helpdesk_task_tracker')->where('id', $taskId)->value('completed_at'));
 
         $this->withSession(['user' => ['id' => 2, 'name' => 'Other Admin', 'role' => 'admin']])
-            ->post("/admin/accomplishments/{$taskId}/delete")
+            ->post("/admin/task-tracker/{$taskId}/delete")
             ->assertSessionHasErrors('form');
-        $this->assertDatabaseHas('helpdesk_accomplishments', ['id' => $taskId]);
+        $this->assertDatabaseHas('helpdesk_task_tracker', ['id' => $taskId]);
 
-        $this->withSession($session)->post("/admin/accomplishments/{$taskId}/delete")
+        $this->withSession($session)->post("/admin/task-tracker/{$taskId}/delete")
             ->assertRedirect();
-        $this->assertDatabaseMissing('helpdesk_accomplishments', ['id' => $taskId]);
+        $this->assertDatabaseMissing('helpdesk_task_tracker', ['id' => $taskId]);
 
-        Schema::drop('helpdesk_accomplishments');
+        Schema::drop('helpdesk_task_tracker');
     }
 
-    private function createAccomplishmentTables(): void
+    private function createTaskTrackerTables(): void
     {
         Schema::create('helpdesk_users', function ($table): void {
             $table->id();
@@ -829,7 +829,7 @@ class ExampleTest extends TestCase
             ['id' => 1, 'role' => 'admin', 'is_active' => 1],
             ['id' => 2, 'role' => 'admin', 'is_active' => 1],
         ]);
-        Schema::create('helpdesk_accomplishments', function ($table): void {
+        Schema::create('helpdesk_task_tracker', function ($table): void {
             $table->id();
             $table->unsignedBigInteger('created_by');
             $table->string('title', 200);

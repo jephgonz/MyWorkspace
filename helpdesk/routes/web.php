@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AccomplishmentController;
+use App\Http\Controllers\TaskTrackerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrowserNotificationController;
 use App\Http\Controllers\DashboardController;
@@ -23,11 +23,11 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function (): 
     Route::get('/notifications', [BrowserNotificationController::class, 'poll'])->name('notifications.poll');
     Route::get('/notifications/settings', [BrowserNotificationController::class, 'settings'])->name('notifications.settings');
     Route::post('/notifications/settings', [BrowserNotificationController::class, 'updateSettings'])->name('notifications.settings.update');
-    Route::get('/accomplishments', [AccomplishmentController::class, 'index'])->name('accomplishments');
-    Route::post('/accomplishments', [AccomplishmentController::class, 'store'])->name('accomplishments.store');
-    Route::post('/accomplishments/{accomplishment}/complete', [AccomplishmentController::class, 'complete'])->name('accomplishments.complete');
-    Route::post('/accomplishments/{accomplishment}', [AccomplishmentController::class, 'update'])->name('accomplishments.update');
-    Route::post('/accomplishments/{accomplishment}/delete', [AccomplishmentController::class, 'destroy'])->name('accomplishments.destroy');
+    Route::get('/task-tracker', [TaskTrackerController::class, 'index'])->name('task-tracker');
+    Route::post('/task-tracker', [TaskTrackerController::class, 'store'])->name('task-tracker.store');
+    Route::post('/task-tracker/{task}/complete', [TaskTrackerController::class, 'complete'])->name('task-tracker.complete');
+    Route::post('/task-tracker/{task}', [TaskTrackerController::class, 'update'])->name('task-tracker.update');
+    Route::post('/task-tracker/{task}/delete', [TaskTrackerController::class, 'destroy'])->name('task-tracker.destroy');
     Route::get('/users', [UserController::class, 'index'])->name('users');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::post('/users/status', [UserController::class, 'setStatus'])->name('users.status');
